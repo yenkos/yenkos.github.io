@@ -34,7 +34,7 @@ $ hexo deploy
 
 More info: [Deployment](https://hexo.io/docs/one-command-deployment.html)
 
-### Preview on localhost
+### Preview on localhost.
 ``` bash
 $ python -m SimpleHTTPServer 8011
 ```
