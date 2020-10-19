@@ -94,7 +94,7 @@ head:
         # E.g., name=theme-color;content=#123456 => <meta name="theme-color" content="#123456">
         - ''
     # URL or path to the website's RSS atom.xml
-    rss:
+    # rss:
 # Page top navigation bar configurations
 navbar:
     # Naviagtion menu items
@@ -108,7 +108,7 @@ navbar:
     links:
         Download on GitHub:
             icon: fab fa-github
-            url: 'https://github.com/ppoffice/hexo-theme-icarus'
+            url: 'https://github.com/yenkos'
 # Page footer configurations
 footer:
     # Links to be shown on the right of the footer section
@@ -234,7 +234,7 @@ widgets:
         social_links:
             Github:
                 icon: fab fa-github
-                url: 'https://github.com'
+                url: 'https://github.com/yenkos'
             Facebook:
                 icon: fab fa-facebook
                 url: 'https://facebook.com'
@@ -244,9 +244,9 @@ widgets:
             Dribbble:
                 icon: fab fa-dribbble
                 url: 'https://dribbble.com'
-            RSS:
-                icon: fas fa-rss
-                url: /
+            # RSS:
+                # icon: fas fa-rss
+                # url: /
     # Table of contents widget configurations
     -
         # Where should the widget be placed, left sidebar or right sidebar
@@ -258,7 +258,7 @@ widgets:
     -
         # Where should the widget be placed, left sidebar or right sidebar
         position: left
-        type: links
+        # type: links
         # Names and URLs of the sites
         links:
             Hexo: 'https://hexo.io'
@@ -286,21 +286,21 @@ widgets:
     # Google FeedBurner email subscription widget configurations
     -
         # Where should the widget be placed, left sidebar or right sidebar
-        position: left
-        type: subscribe_email
+        # position: left
+        # type: subscribe_email
         # Hint text under the email input
-        description:
+        # description:
         # Feedburner ID
-        feedburner_id: ''
+        # feedburner_id: ''
     # Google AdSense unit configurations
     -
         # Where should the widget be placed, left sidebar or right sidebar
-        position: left
-        type: adsense
+        # position: left
+        # type: adsense
         # AdSense client ID
-        client_id: ''
+        # client_id: ''
         # AdSense AD unit ID
-        slot_id: ''
+        # slot_id: ''
 # Plugin configurations
 # https://ppoffice.github.io/hexo-theme-icarus/categories/Plugins/
 plugins:
