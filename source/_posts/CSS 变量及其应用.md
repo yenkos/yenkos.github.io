@@ -1,3 +1,6 @@
+---
+title: CSS 变量及其应用
+---
 # CSS 变量及其应用
 
 <a name="lkSvl"></a>
@@ -35,7 +38,7 @@ element {
 }
 ```
 <a name="1w34a"></a>
-### 
+###
 <a name="xrm9i"></a>
 ### 使用自定义属性的第一步
 我们从这个简单的CSS代码开始，它将相同的颜色应用在了不同class的元素上：
@@ -120,7 +123,7 @@ element {
 ```
 这里呈现的结果和前面的例子是一致的，但允许对所需属性值进行一个规范的声明。
 <a name="340DF"></a>
-### 
+###
 <a name="jFKal"></a>
 ### 自定义属性的继承性
 自定义属性会继承。这意味着如果在一个给定的元素上，没有为这个自定义属性设置值，在其父元素上的值会被使用。看这一段HTML：
@@ -150,7 +153,7 @@ element {
 
 注意，这些是自定义属性，并不是你在其他编程语言中遇到的实际的变量。这些值仅当需要的时候才会计算，而并不会按其他规则进行保存。比如，你不能为元素设置一个属性，然后让它从兄弟或旁支子孙规则上获取值。属性仅用于匹配当前选择器及其子孙，这和通常的CSS是一样的。
 <a name="u6pZb"></a>
-### 
+###
 <a name="q4uZ6"></a>
 ### 自定义属性备用值
 用 [`var()`](https://developer.mozilla.org/zh-CN/docs/Web/CSS/var()) 函数可以定义多个**备用值**(fallback value)，当给定值未定义时将会用备用值替换。这对于 [Custom Elements](https://wiki.developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements) 和 [Shadow DOM](https://wiki.developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM) 都很有用。<br />**备用值并不是用于实现浏览器兼容性的。**如果浏览器不支持CSS自定义属性，备用值也没什么用。**它仅对支持CSS自定义属性的浏览器提供了一个备份机制**，该机制仅当给定值未定义或是无效值的时候生效。<br />函数的第一个参数是[自定义属性](https://www.w3.org/TR/css-variables/#custom-property)的名称。如果提供了第二个参数，则表示备用值，当[自定义属性](https://www.w3.org/TR/css-variables/#custom-property)值无效时生效。第二个参数可以嵌套，但是不能继续平铺展开下去了，例如：
@@ -167,12 +170,12 @@ element {
 ```
 第二个例子展示了如何处理一个以上的 fallback。该技术可能会导致性能问题，因为它花了更多的时间在处理这些变量上。<br />**注意：**像[自定义属性](https://www.w3.org/TR/css-variables/#custom-property)这些 fallback 语法允许使用逗号。比如 `var(--foo, red, blue)` 定义了一个 `red, blue` 的备用值——从第一个逗号到最后的全部内容，都会被作为备用值的一部分。
 <a name="UzlaA"></a>
-### 
+###
 <a name="s76k9"></a>
 ### 有效性和值
 传统的CSS概念里，有效性和属性是绑定的，这对自定义属性来说并不适用。当自定义属性值被解析，浏览器不知道它们什么时候会被使用，所以必须认为这些值都是_有效的_。<br />不幸的是，即便这些值是有效的，但当通过 `var()` 函数调用时，它在特定上下文环境下也可能不会奏效。属性和自定义变量会导致无效的CSS语句，这引入了一个新的概念：_计算时有效性_。
 <a name="JIIwG"></a>
-### 
+###
 <a name="Hzeml"></a>
 ### 无效变量会导致什么？
 当浏览器遇到无效的 `var()` 时，会使用继承值或初始值代替。<br />考虑如下代码：<br />
@@ -183,8 +186,8 @@ element {
 
 
 ```css
-:root { --text-color: 16px; } 
-p { color: blue; } 
+:root { --text-color: 16px; }
+p { color: blue; }
 p { color: var(--text-color); }
 ```
 毫不意外，浏览器将 `--text-color` 的值替换给了 `var(--text-color)`，但是 `16px` 并不是 [`color`](https://developer.mozilla.org/zh-CN/docs/Web/CSS/color) 的合法属性值。代换之后，该属性不会产生任何作用。浏览器会执行如下两个步骤：
@@ -195,7 +198,7 @@ p { color: var(--text-color); }
 
 <br />段落颜色并不是蓝色，因为无效代换导致了它被替换成了默认初始值的黑色。如果你直接写n `color: 16px` 的话，则会导致语法错误，而前面的定义则会生效（段落显示为蓝色）。<br />**注意：**当CSS属性-值对中存在语法错误，该行则会被忽略。然而如果自定义属性的值无效，它并不会被忽略，从而会导致该值被覆盖为默认值。
 <a name="1o2YB"></a>
-### 
+###
 <a name="euKww"></a>
 ### JavaScript 中的值
 在 JavaScript 中获取或者修改 CSS  变量和操作普通 CSS 属性是一样的：
@@ -215,12 +218,12 @@ element.style.setProperty("--my-var", jsVar + 4);
 ### 实现黑夜模式
 深色模式为目前网络发展的一大趋势，可以看到大量的网站为了提高网站的体验都添加了深色模式。深色模式在光线不足的情况下看起来不会那么刺眼，能够很好的保护我们的眼睛。<br />在这边文章中主要讲如何使用CSS和JS实现深色模式和浅色模式的任意切换
 <a name="3vp2n"></a>
-### 
+###
 <a name="LRNvJ"></a>
 ### 分析需求
 假设有这么一个页面，我们需要自由切换深色模式和浅色模式。那么就需要在不同模式使用不同的css，这里可以通过两种方式一种是直接引入不同的css文件，另外一种通过更改css变量值的方式进行更改样式，下面是浅色模式的截图
 <a name="cHbVZ"></a>
-### 
+###
 <a name="zwOc9"></a>
 ### 具体实现
 首先定义浅色模式的变量名和变量值
@@ -253,7 +256,7 @@ element.style.setProperty("--my-var", jsVar + 4);
 ```
 可以看到当切换到深色模式的时候，变量使用了更加暗的颜色，从而实现深色模式
 <a name="RnZkn"></a>
-### 
+###
 <a name="CVrOE"></a>
 ### 更改css
 如何切换到暗模式有多种解决方法，在这里我们使用媒体查询，`prefers-color-scheme`这个媒体查询能够获取到用户的系统是否切换到了深色主题，具体如下:
@@ -275,7 +278,7 @@ element.style.setProperty("--my-var", jsVar + 4);
 ```
 如果希望用户可以通过选择系统的设置来切换浅色模式还是深色模式，那么上面这种方式就足够了。浏览的网站能够通过系统设置选择不同的样式<br />但是上面这种方式存在一个问题，就是用户希望这个页面的模式不要跟随系统配置的更改而更改。用户可以主动更改网站的模式，那么上面这种方式就不合适了
 <a name="Yln4Y"></a>
-### 
+###
 <a name="P8NYk"></a>
 ### 手动选择模式
 思路就是通过控制js来给元素添加不同的class，不同的class拥有不同的样式。首先添加在html中添加一个按钮用于切换不同的模式
@@ -289,7 +292,7 @@ element.style.setProperty("--my-var", jsVar + 4);
 然后需要地方存储用户的偏好设置，这里使用localStorage来存储用户的选择。<br />然后给按钮添加事件用于切换主题，下面是具体的代码
 ```javascript
 const toggleButton = document.querySelector('#toggle-button')
-  
+
   toggleButton.addEventListener('click', (e) => {
     darkMode = localStorage.getItem('theme');
     if (darkMode === 'dark') {
