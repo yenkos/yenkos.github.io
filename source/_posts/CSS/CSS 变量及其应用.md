@@ -1,7 +1,6 @@
 ---
 title: CSS 变量及其应用
 ---
-# CSS 变量及其应用
 
 <a name="lkSvl"></a>
 ## 基本介绍
