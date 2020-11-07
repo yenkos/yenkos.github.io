@@ -154,12 +154,8 @@ search:
 # https://ppoffice.github.io/hexo-theme-icarus/categories/Plugins/Comment/
 comment:
     type: disqusjs
-    shortname: my-hexo-blog-1
+    shortname: my-blog
     api_key: FHN404hDCq4UjybTvgSB9BvK8YtZOMlL7ngYZD4WUHD3N4DwKKouLCjZ3nJyHLgB
-    api: https://disqus.skk.moe/disqus/     # 可选填
-    admin: ppoffice                         # 可选填
-    admin_label: Admin                      # 可选填
-    nesting: 4                              # 可选填
 
 # Sidebar configurations.
 # Please be noted that a sidebar is only visible when it has at least one widget
