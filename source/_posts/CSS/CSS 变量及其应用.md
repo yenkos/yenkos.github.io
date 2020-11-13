@@ -12,7 +12,7 @@ title: CSS 变量及其应用
 - 读取css变量，需要使用val()方法，sass和less可以直接使用。
 - css最大优势在于不需要编译，在运行时可以随时修改，同时应用到上下文。缺点是不兼容ie浏览器。
 
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/203222/1604713577345-d881bc3c-8817-44e3-b9db-ca8e8a8aae55.png#align=left&display=inline&height=357&margin=%5Bobject%20Object%5D&name=image.png&originHeight=984&originWidth=2062&size=180395&status=done&style=none&width=749)<br />
+![image.png](https://cdn.nlark.com/yuque/0/2020/png/203222/1604713577345-d881bc3c-8817-44e3-b9db-ca8e8a8aae55.png?x-oss-process=image%2Fresize%2Cw_1492)<br />
 
 ### 基本用法
 声明一个自定义属性，属性名需要以两个减号（`--`）开始，属性值则可以是任何有效的CSS值。和其他属性一样，自定义属性也是写在规则集之内的，如下：
