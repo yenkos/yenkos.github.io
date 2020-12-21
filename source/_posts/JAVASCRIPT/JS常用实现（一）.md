@@ -141,21 +141,15 @@ const newObject = (parentObject, ...args) => {
 <a name="r93wO"></a>
 ## deepClone (深拷贝)
 网上的深拷贝代码一般都有些问题的，因为对于一些特殊的对象没有进行处理，但是一般也不会出现bug，简单的深拷贝有时也能实现功能。<br />
-<br />**实现一: JSON.stringify && JSON.parse**<br />通过JSON的两个方法使对象重新构造成新的对象实现深拷贝，它的问题在于会丢弃对象的constructor，也不支持循环引用对象，同时必须保证处理的对象为能够被json数据结构表示。
+<br />**实现一 JSON.stringify && JSON.parse**<br />通过JSON的两个方法使对象重新构造成新的对象实现深拷贝，它的问题在于会丢弃对象的constructor，同时必须保证处理的对象为能够被json数据结构表示。
 
-不推荐这种实现，如果要用，需要配和错误捕获方法来使用。
+不推荐这种实现，如果要用，需要配合错误捕获方法来使用。
 ```javascript
 const a = {};
 const b = JSON.parse(JSON.stringify(a));
-
-// 报错
-const a2 = {};
-const b2 = {a2};
-const c2 = JSON.parse(JSON.stringify(2b));
-
 ```
 
-<br />**实现二: 递归**<br />存在问题，支持的特殊对象不是很多，但是还算优雅，解决了循环引用的问题，遇到已经引用过的对象，不再重复循环一遍。
+<br />**实现二 递归**<br />存在问题，支持的特殊对象不是很多，但是还算优雅，解决了循环引用的问题，遇到已经引用过的对象，不再重复循环一遍。
 ```javascript
 const deepClone = (obj, cache = new WeakMap()) => {
   if (!obj instanceof Object) return obj;
