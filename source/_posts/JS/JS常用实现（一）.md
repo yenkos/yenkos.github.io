@@ -141,7 +141,14 @@ const newObject = (parentObject, ...args) => {
 <a name="r93wO"></a>
 ## deepClone (深拷贝)
 网上的深拷贝代码一般都有些问题的，因为对于一些特殊的对象没有进行处理，但是一般也不会出现bug，简单的深拷贝有时也能实现功能。<br />
-<br />**实现一 JSON.stringify && JSON.parse**<br />通过JSON的两个方法使对象重新构造成新的对象实现深拷贝，它的问题在于会丢弃对象的constructor，同时必须保证处理的对象为能够被json数据结构表示。
+<br />对象有可能出现循环引用。
+```javascript
+const a = { name: 'ben' };
+const b = { a };
+a.b = b;
+```
+结构如下：<br />![image.png](https://cdn.nlark.com/yuque/0/2020/png/203222/1608545160175-d968b3c8-a9c2-4633-8fe2-160544be3747.png#align=left&display=inline&height=347&margin=%5Bobject%20Object%5D&name=image.png&originHeight=694&originWidth=1224&size=65692&status=done&style=none&width=612)<br />
+<br />**实现一 JSON.stringify && JSON.parse**<br />通过JSON的两个方法使对象重新构造成新的对象实现深拷贝，它的问题在于会丢弃对象的constructor，也不支持循环引用。同时必须保证处理的对象为能够被json数据结构表示，不符合转换规则会抛出错误。
 
 不推荐这种实现，如果要用，需要配合错误捕获方法来使用。
 ```javascript
@@ -149,7 +156,8 @@ const a = {};
 const b = JSON.parse(JSON.stringify(a));
 ```
 
-<br />**实现二 递归**<br />存在问题，支持的特殊对象不是很多，但是还算优雅，解决了循环引用的问题，遇到已经引用过的对象，不再重复循环一遍。
+<br />**实现二 递归**<br />存在问题，支持的特殊对象不是很多，但是还算优雅，解决了循环引用的问题，同时遇到已经引用过的对象，不再重复循环一遍。可以解决循环引用问题，因为遇到相同对象会从cache里直接拿出来返回，并且拿出来的是已经处理过的对象，不进入循环。<br />
+
 ```javascript
 const deepClone = (obj, cache = new WeakMap()) => {
   if (!obj instanceof Object) return obj;
@@ -173,6 +181,63 @@ const deepClone = (obj, cache = new WeakMap()) => {
 
   return res;
 }
+
 ```
 
+<br />测试用例
+```javascript
+// 执行解释
+
+// 执行deepClone(a);
+// 'a对应对象'本身不在缓存里，将res设置为缓存，此时初始res = {}; 初始res同时也是递归结束后要返回的对象。
+// 进入循环
+// key等于name，不在缓存里，设置缓存。继续执行，不是对象，直接返回。此时初始res = {name: 'ben'};
+// key等于b，不在缓存里，设置缓存。继续执行，b值是对象。进入下一层循环。此时初始res = {name: 'ben'}; b的res是： {}
+// key等于a，在缓存里，拿出来返回。b的res是: { a: 初始res }。循环结束，函数返回b的res。 此时初始res = {name: 'ben', b: { a: 初始res }};
+// 循环结束，返回初始res {name: 'ben', b: { a: 初始res }}
+
+// 注意！当时设置'a对应对象'的缓存值是新构造的res对象，所以新拿出来的'a对应对象'的缓存值，是重新构造后的值，并不是原始的值。
+// 变成了新的克隆对象循环引用构造后的它自己本身的值。
+
+const a = { name: 'ben' };
+const b = { a };
+a.b = b;
+
+const deepClone = (obj, cache = new WeakMap()) => {
+  if (!obj instanceof Object) return obj;
+  if (cache.get(obj)) return cache.get(obj); // 防止循环引用
+  if (obj instanceof Function) {
+    return (...arg) => { obj.apply(this, args) }
+  } // 支持函数
+  if (obj instanceof Date) return new Date(obj); // 支持日期
+  if (obj instanceof RegExp) return new RegExp(obj.source, obj.flags); // 支持正则对象
+
+  const res = Array.isArray(obj) ? [] : {};
+	cache.set(obj, res);   // 缓存 copy 的对象，用于处理循环引用的情况
+
+  Object.keys(obj).forEach((key) => {
+    console.log(key);
+    if (obj[key] instanceof Object) {
+      res[key] = deepClone(obj[key], cache);
+    } else {
+      res[key] = obj[key];
+    }
+  });
+
+  console.log(res, 'res');
+  return res;
+}
+
+const c = deepClone(a);
+console.log(a.b.a.b.a.b === c.b.a.b.a.b); // false
+
+a.age = 1;
+c.age = 2;
+
+console.log(a);
+console.log(c);
+
+```
+
+<br />输出<br />![image.png](https://cdn.nlark.com/yuque/0/2020/png/203222/1608547691637-0a004a8f-5381-43d3-8567-adc823a26f67.png#align=left&display=inline&height=193&margin=%5Bobject%20Object%5D&name=image.png&originHeight=193&originWidth=294&size=10090&status=done&style=none&width=294)<br />
 
