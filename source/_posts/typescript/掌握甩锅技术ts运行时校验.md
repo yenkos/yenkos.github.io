@@ -1,7 +1,7 @@
 ---
-title: 掌握甩锅技术: Typescript 运行时数据校验 · Issue #13 · SunshowerC/blog
-categories: ['typescript']
-tags: ['typescript', '工程化']
+title: 掌握甩锅技术 Typescript 运行时数据校验
+categories: ['工程化']
+tags: ['工程化']
 ---
 
 
