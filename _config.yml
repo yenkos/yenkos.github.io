@@ -63,9 +63,4 @@ ignore: null
 theme: icarus
 deploy:
   type: ''
-widgets:
-  - type: profile
-    position: left
-  - type: recent_posts
-    position: left
-
+widgets: null
