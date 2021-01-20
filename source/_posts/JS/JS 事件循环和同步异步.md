@@ -4,8 +4,8 @@ categories: ['Javascript']
 tags: ['Javascript', 'html', 'nodejs']
 ---
 
-某日，群里有人发了一张这样的图，问输出结果为什么和预期的不一样，有几个人在讨论，都说不出个为什么。这一看就是一道面试题，考察了js的同步异步和事件循环，当然工作中类似的场景也非常多，这道题对于理解同类的问题会有一定的帮助。这里就这道题，解析一下它是如何执行的。在继续看下面内容之前，可以把你的答案先记下来。<br />
-<br />![image.png](https://cdn.nlark.com/yuque/0/2021/png/203222/1611107142638-dac4e3de-0a74-4f1e-85ae-15abec94f72a.png#align=left&display=inline&height=244&margin=%5Bobject%20Object%5D&name=image.png&originHeight=488&originWidth=800&size=197788&status=done&style=none&width=400)<br />
+某日，群里有人发了一张这样的图，问输出结果为什么和预期的不一样，有几个人在讨论，都说不出个为什么。这一看就是一道面试题，考察了js的同步异步和事件循环，当然工作中类似的场景也非常多，这道题对于理解同类的问题会有一定的帮助。这里就这道题，解析一下它是如何执行的。在继续看下去之前，可以把你的答案先记下来。<br />
+<br />
 
 ```javascript
 async function async1() {
