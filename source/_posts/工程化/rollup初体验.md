@@ -9,7 +9,7 @@ tags: ['工程化']
 <br />安装ts<br />npm install -D typescript      <br />
 <br />生存配置文件<br />./node_modules/.bin/tsc --init
 
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/203222/1609398709224-7e2a4465-2939-43ac-94c8-18ea8d71a132.png#align=left&display=inline&height=152&margin=%5Bobject%20Object%5D&name=image.png&originHeight=152&originWidth=754&size=14915&status=done&style=none&width=754)<br />
+![](https://raw.githubusercontent.com/yenkos/PicGo/main/img/20210122102133.png)<br />
 <br />根目录下新建一个rollup配置文件<br />rollup.config.js
 
 添加以下内容
@@ -105,5 +105,6 @@ export default {
 首先需要注册npm账号
 
 npm adduser<br />npm login<br />npm publish<br />
-<br />![image.png](https://cdn.nlark.com/yuque/0/2020/png/203222/1609410556289-98a91d3e-a6be-45db-b790-a053c908d720.png#align=left&display=inline&height=375&margin=%5Bobject%20Object%5D&name=image.png&originHeight=750&originWidth=1152&size=173447&status=done&style=none&width=576)<br />
+<br />![](https://raw.githubusercontent.com/yenkos/PicGo/main/img/20210122102143.png)<br />
+
 
