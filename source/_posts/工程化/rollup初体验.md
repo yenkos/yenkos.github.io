@@ -1,7 +1,7 @@
 ---
 title: rollup初体验
 categories: ['工程化']
-tags: ['工程化']
+tags: ['工程化', 'rollup']
 ---
 
 
