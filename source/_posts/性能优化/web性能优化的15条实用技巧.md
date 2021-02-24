@@ -1,7 +1,7 @@
 ---
 title: web性能优化的15条实用技巧
-categories: ['性能优化']
-tags: ['工程化', '性能优化']
+categories: ["性能优化"]
+tags: ["工程化", "性能优化"]
 ---
 
 > javascript 在浏览器中运行的性能，可以认为是开发者所面临的最严重的可用性问题。这个问题因为 javascript 的阻塞性而变得复杂，事实上，多数浏览器使用单一进程来处理用户界面和 js 脚本执行，所以同一时刻只能做一件事。js 执行过程耗时越久，浏览器等待响应的时间越长。
@@ -21,34 +21,34 @@ tags: ['工程化', '性能优化']
 > 无论何时启动下载，文件的下载和执行都不会阻塞页面其他进程。
 
 ```javascript
-function laodScript(url,callback){
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
+function laodScript(url, callback) {
+  var script = document.createElement("script");
+  script.type = "text/javascript";
 
-    if(script.readyState){
-        script.onreadystatechange = function(){
-            if(script.readyState == 'loaded' || script.readyState == 'complete'){
-                script.onreadystatechange = null;
-                callback()
-            }
-        }
-    }else{
-        script.onload = function(){
-            callback()
-        }
-    }
-    script.src = url;
-    document.getElementsByTagName('head')[0].appendChild(script);
+  if (script.readyState) {
+    script.onreadystatechange = function () {
+      if (script.readyState == "loaded" || script.readyState == "complete") {
+        script.onreadystatechange = null;
+        callback();
+      }
+    };
+  } else {
+    script.onload = function () {
+      callback();
+    };
+  }
+  script.src = url;
+  document.getElementsByTagName("head")[0].appendChild(script);
 }
 
 // 使用
-loadScript('./a.js',function(){
-    loadScript('./b.js',function(){
-        loadScript('./c.js',function(){
-            console.log('加载完成')
-        })
-    })
-})
+loadScript("./a.js", function () {
+  loadScript("./b.js", function () {
+    loadScript("./c.js", function () {
+      console.log("加载完成");
+    });
+  });
+});
 ```
 
 > 4. 无阻塞加载类库——LABjs, 使用方法如下：
@@ -97,11 +97,11 @@ $LAB.script('./a.js').wait()
 ① 优化一——集合转数组 collToArr
 
 ```javascript
-function collToArr(coll){
-    for(var i=0, a=[], len=coll.length; i<len; i++){
-        a.push(coll[i]);
-    }
-    return a
+function collToArr(coll) {
+  for (var i = 0, a = [], len = coll.length; i < len; i++) {
+    a.push(coll[i]);
+  }
+  return a;
 }
 ```
 
@@ -121,12 +121,12 @@ function collToArr(coll){
 | nextElementSibling | nextSibling |
 | previousElementSibling | previousSibling |
 
- ② 选择器 API——querySelectorAll()
+② 选择器 API——querySelectorAll()
 
 > querySelectorAll() 方法使用 css 选择器作为参数并返回一个 NodeList——包含着匹配节点的类数组对象，该方法不会返回 HTML 集合，因此返回的节点不会对应实时文档结构，着也避免了 HTML 集合引起的性能问题。
 
 ```javascript
-let arr = document.querySelectorAll('div.warning, div.notice > p')
+let arr = document.querySelectorAll("div.warning, div.notice > p");
 ```
 
 4\. 重绘和重排
@@ -135,7 +135,7 @@ let arr = document.querySelectorAll('div.warning, div.notice > p')
 
 ① 重排发生的条件：
 
-添加或删除可见的 DOM 元素位置变化 元素尺寸改变 内容改变 页面渲染器初始化 浏览器窗口尺寸变化 出现滚动条时会触发整个页面的重排 
+添加或删除可见的 DOM 元素位置变化 元素尺寸改变 内容改变 页面渲染器初始化 浏览器窗口尺寸变化 出现滚动条时会触发整个页面的重排
 
 重排必定重绘
 
@@ -149,11 +149,11 @@ let arr = document.querySelectorAll('div.warning, div.notice > p')
 
 ```javascript
 // 设置样式
-body.style.color = 'red';
-body.style.fontSize = '24px'
+body.style.color = "red";
+body.style.fontSize = "24px";
 // 读取样式
-let color = body.style.color
-let fontSize = body.style.fontSize
+let color = body.style.color;
+let fontSize = body.style.fontSize;
 ```
 
 另外，获取计算属性的兼容写法：
@@ -217,6 +217,7 @@ var data = [
     {name: 'xujaing',text: '选景', title: 'xuanfij'},
     {name: 'xujaing',text: '选景', title: 'xuanfij'}
 ];
+
 appendDataToEl({
     target: wrap,
     createEl: 'div',
@@ -224,7 +225,7 @@ appendDataToEl({
 });
 ```
 
-> 上面的优化方法使用了文档片段: 当我们把文档片段插入到节点中时，实际上被添加的只是该片段的子节点，而不是片段本身。可以使得 dom 操作更有效率。
+> 上面的优化方法使用了文档片段:  当我们把文档片段插入到节点中时，实际上被添加的只是该片段的子节点，而不是片段本身。可以使得 dom 操作更有效率。
 
 > ③. 缓存布局信息
 
@@ -232,9 +233,9 @@ appendDataToEl({
 //缓存布局信息
 let current = el.offsetLeft;
 current++;
-el.style.left = current + 'px';
-if(current > 300){
-    stop();
+el.style.left = current + "px";
+if (current > 300) {
+  stop();
 }
 ```
 
@@ -245,22 +246,26 @@ if(current > 300){
 > ⑤. 使用事件委托（通过事件冒泡实现）来减少事件处理器的数量，减少内存和处理时间
 
 ```javascript
-function delegation(e,selector,callback){
-    e = e || window.event;
-    var target = e.target || e.srcElement;
+function delegation(e, selector, callback) {
+  e = e || window.event;
+  var target = e.target || e.srcElement;
 
-    if(target.nodeName !== selector || target.className !== selector || target.id !== selector){
-        return;
-    }
-    if(typeof e.preventDefault === 'function'){
-        e.preventDefault();
-        e.stopPropagation();
-    }else{
-        e.returnValue = false;
-        e.cancelBubble = true;
-    }
+  if (
+    target.nodeName !== selector ||
+    target.className !== selector ||
+    target.id !== selector
+  ) {
+    return;
+  }
+  if (typeof e.preventDefault === "function") {
+    e.preventDefault();
+    e.stopPropagation();
+  } else {
+    e.returnValue = false;
+    e.cancelBubble = true;
+  }
 
-    callback()
+  callback();
 }
 ```
 
@@ -297,10 +302,10 @@ items.forEach(function(value,index,array){
 > 1\. 除了 IE 外，其他浏览器会尝试为表达式左侧的字符串分配更多的内存，然后简单的将第二个字符串拷贝到他的末尾，如果在一个循环中，基础字符串位于最左侧，就可以避免重复拷贝一个逐渐变大的基础字符串。2. 使用\[\\s\\S]来匹配任意字符串 3. 去除尾部空白的常用做法：
 
 ```javascript
-if(!String.prototype.trim){
-    String.prototype.trim = function(){
-        return this.replace(/^\s+/,'').replace(/\s\s*$/, '')
-    }
+if (!String.prototype.trim) {
+  String.prototype.trim = function () {
+    return this.replace(/^\s+/, "").replace(/\s\s*$/, "");
+  };
 }
 ```
 
@@ -313,41 +318,41 @@ if(!String.prototype.trim){
 > 3\. 用延时数组分割耗时任务：
 
 ```javascript
-function multistep(steps,args,callback){
-    var tasks = steps.concat();
+function multistep(steps, args, callback) {
+  var tasks = steps.concat();
 
-    setTimeout(function(){
-        var task = tasks.shift();
-        task.apply(null, args || []);
+  setTimeout(function () {
+    var task = tasks.shift();
+    task.apply(null, args || []);
 
-        if(tasks.length > 0){
-            setTimeout(arguments.callee, 25);
-        }else{
-            callback();
-        }
-    },25);
+    if (tasks.length > 0) {
+      setTimeout(arguments.callee, 25);
+    } else {
+      callback();
+    }
+  }, 25);
 }
 ```
 
 > 4\. 记录代码运行时间批处理任务：
 
 ```javascript
-function timeProcessArray(items,process,callback){
-    var todo = item.concat();
+function timeProcessArray(items, process, callback) {
+  var todo = item.concat();
 
-    setTimeout(function(){
-        var start = +new Date();
+  setTimeout(function () {
+    var start = +new Date();
 
-        do{
-            process(todo.shift());
-        }while(todo.length > 0 && (+new Date() - start < 50));
+    do {
+      process(todo.shift());
+    } while (todo.length > 0 && +new Date() - start < 50);
 
-        if(todo.length > 0){
-            setTimeout(arguments.callee, 25);
-        }else{
-            callback(items);
-        }
-    },25)
+    if (todo.length > 0) {
+      setTimeout(arguments.callee, 25);
+    } else {
+      callback(items);
+    }
+  }, 25);
 }
 ```
 
@@ -375,7 +380,7 @@ function timeProcessArray(items,process,callback){
 >
 > 2.  复杂数学运算（包括图像，视屏处理）
 >
-> 3. 大数组排序
+> 3.  大数组排序
 
 ```php
 
@@ -445,18 +450,18 @@ beacon.onerror = function(){
 
 ```javascript
 // 1.延迟加载
-var a = (x,y) =>{
-    if(x > 4){
-        a = 0;
-    }else{
-        a = 1;
-    }
-}
+var a = (x, y) => {
+  if (x > 4) {
+    a = 0;
+  } else {
+    a = 1;
+  }
+};
 // 需要使用时调用
 a();
 
 // 2.条件预加载（适用于函数马上执行并频繁操作的场景）
-var b = a > 0 ? '4' : '0';
+var b = a > 0 ? "4" : "0";
 ```
 
 > 2\. 使用 Object/Array 字面量
@@ -476,18 +481,18 @@ var b = a > 0 ? '4' : '0';
 ```javascript
 // 检测代码运行时间
 var Timer = {
-    _data: {},
-    start: function(key){
-        Timer._data[key] = new Date();
-    },
-    stop: function(key){
-        var time = Timer._data[key];
-        if(time){
-            Timer._data[key] = new Date() - time;
-        };
-        console.log(Timer._data[key]);
-        return Timer._data[key]
+  _data: {},
+  start: function (key) {
+    Timer._data[key] = new Date();
+  },
+  stop: function (key) {
+    var time = Timer._data[key];
+    if (time) {
+      Timer._data[key] = new Date() - time;
     }
+    console.log(Timer._data[key]);
+    return Timer._data[key];
+  },
 };
 ```
 
@@ -495,7 +500,7 @@ var Timer = {
 
 > 1\. 添加 Expires 头
 
-> 2\. 使用 cache-control cache-ontrol 详解 浏览器缓存机制
+> 2\. 使用 cache-control cache-ontrol 详解   浏览器缓存机制
 
 #### 十一. 压缩组件
 
@@ -545,15 +550,15 @@ DNS 缓存和 TTL
 
 ### 汇总系列推荐
 
--   [](http://mp.weixin.qq.com/s?__biz=MzU2Mzk1NzkwOA==&mid=2247483927&idx=1&sn=c05490e8c46e5cfba96f4f734c9e4751&chksm=fc531beccb2492fa36e4fe47471ff2f43fd533782fa3254292b029dbb1b383651b11163f54f2&scene=21#wechat_redirect)[](http://mp.weixin.qq.com/s?__biz=MzU2Mzk1NzkwOA==&mid=2247483927&idx=1&sn=c05490e8c46e5cfba96f4f734c9e4751&chksm=fc531beccb2492fa36e4fe47471ff2f43fd533782fa3254292b029dbb1b383651b11163f54f2&scene=21#wechat_redirect)[前端必不可少的 Git 使用技巧](http://mp.weixin.qq.com/s?__biz=MzU2Mzk1NzkwOA==&mid=2247483879&idx=1&sn=650a0301276ffbb3946150bdff981cb8&chksm=fc53181ccb24910a62a08a8635a81c29c2a0c446cc05cf51cdef0ce11e006ca3570e5a858e32&scene=21#wechat_redirect)
--   [《javascript 高级程序设计》核心知识总结](http://mp.weixin.qq.com/s?__biz=MzU2Mzk1NzkwOA==&mid=2247483921&idx=1&sn=1566ed50bba3619cffdda36c535a4e33&chksm=fc531beacb2492fce461de9f9fdfd52ecd2e107c4c4395d6b579b4841298130434e9dfdf105a&scene=21#wechat_redirect)
--   [前端开发中不可忽视的知识点汇总（一）](http://mp.weixin.qq.com/s?__biz=MzU2Mzk1NzkwOA==&mid=2247483879&idx=1&sn=650a0301276ffbb3946150bdff981cb8&chksm=fc53181ccb24910a62a08a8635a81c29c2a0c446cc05cf51cdef0ce11e006ca3570e5a858e32&scene=21#wechat_redirect)
--   [css3 实战汇总（附源码）](http://mp.weixin.qq.com/s?__biz=MzU2Mzk1NzkwOA==&mid=2247483869&idx=1&sn=be680c5ac7f3e3ad1ddf60daf1569800&chksm=fc531826cb249130f8874c8db57fd6276cd7e0ca308b9c17efe1e2792370a4f1907978c4ad70&scene=21#wechat_redirect)
--   [让你瞬间提高工作效率的常用 js 函数汇总 (持续更新)](http://mp.weixin.qq.com/s?__biz=MzU2Mzk1NzkwOA==&mid=2247483716&idx=1&sn=5a60c4280fef8ca2ec6dece43c4f772b&chksm=fc5318bfcb2491a91308880bfac2efa8b4df91e102a2423ed5c677e26fde389a35ef01151260&scene=21#wechat_redirect)
+- [](http://mp.weixin.qq.com/s?__biz=MzU2Mzk1NzkwOA==&mid=2247483927&idx=1&sn=c05490e8c46e5cfba96f4f734c9e4751&chksm=fc531beccb2492fa36e4fe47471ff2f43fd533782fa3254292b029dbb1b383651b11163f54f2&scene=21#wechat_redirect)[](http://mp.weixin.qq.com/s?__biz=MzU2Mzk1NzkwOA==&mid=2247483927&idx=1&sn=c05490e8c46e5cfba96f4f734c9e4751&chksm=fc531beccb2492fa36e4fe47471ff2f43fd533782fa3254292b029dbb1b383651b11163f54f2&scene=21#wechat_redirect)[前端必不可少的 Git 使用技巧](http://mp.weixin.qq.com/s?__biz=MzU2Mzk1NzkwOA==&mid=2247483879&idx=1&sn=650a0301276ffbb3946150bdff981cb8&chksm=fc53181ccb24910a62a08a8635a81c29c2a0c446cc05cf51cdef0ce11e006ca3570e5a858e32&scene=21#wechat_redirect)
+- [《javascript 高级程序设计》核心知识总结](http://mp.weixin.qq.com/s?__biz=MzU2Mzk1NzkwOA==&mid=2247483921&idx=1&sn=1566ed50bba3619cffdda36c535a4e33&chksm=fc531beacb2492fce461de9f9fdfd52ecd2e107c4c4395d6b579b4841298130434e9dfdf105a&scene=21#wechat_redirect)
+- [前端开发中不可忽视的知识点汇总（一）](http://mp.weixin.qq.com/s?__biz=MzU2Mzk1NzkwOA==&mid=2247483879&idx=1&sn=650a0301276ffbb3946150bdff981cb8&chksm=fc53181ccb24910a62a08a8635a81c29c2a0c446cc05cf51cdef0ce11e006ca3570e5a858e32&scene=21#wechat_redirect)
+- [css3 实战汇总（附源码）](http://mp.weixin.qq.com/s?__biz=MzU2Mzk1NzkwOA==&mid=2247483869&idx=1&sn=be680c5ac7f3e3ad1ddf60daf1569800&chksm=fc531826cb249130f8874c8db57fd6276cd7e0ca308b9c17efe1e2792370a4f1907978c4ad70&scene=21#wechat_redirect)
+- [让你瞬间提高工作效率的常用 js 函数汇总 (持续更新)](http://mp.weixin.qq.com/s?__biz=MzU2Mzk1NzkwOA==&mid=2247483716&idx=1&sn=5a60c4280fef8ca2ec6dece43c4f772b&chksm=fc5318bfcb2491a91308880bfac2efa8b4df91e102a2423ed5c677e26fde389a35ef01151260&scene=21#wechat_redirect)
 
 欢迎关注下方公众号，获取更多前端知识精粹和学习社群：
 
-回复 **学习路径**，将获取笔者多年从业经验的前端学习路径的思维导图
+回复  **学习路径**，将获取笔者多年从业经验的前端学习路径的思维导图
 
 回复 **lodash**，将获得本人亲自翻译的 lodash API 中文思维导图
 
@@ -564,4 +569,4 @@ Vue、React、小程序、Node
 ![](https://mmbiz.qpic.cn/mmbiz_jpg/dFTfMt0114icqICY55gwgsAIS4EQyl2GnZFYOQ7DJYMnwGUpVSak6sibib9n3hAjQQKy5Mofpun9PXQY0lTspniaOQ/640?wx_fmt=jpeg)
 
 **前端**算法 | 性能 | 架构 | 安全
- [https://mp.weixin.qq.com/s?\_\_biz=MzU2Mzk1NzkwOA%3D%3D&chksm=fc531be6cb2492f04475bac0fecbd1a9f9781ca67f35bd30c320964b24a8cbc2ca3d7bbd5345&idx=1&mid=2247483933&scene=21&sn=c2729ef1fd4a28f4707bb923a5ffae79#wechat_redirect](https://mp.weixin.qq.com/s?__biz=MzU2Mzk1NzkwOA%3D%3D&chksm=fc531be6cb2492f04475bac0fecbd1a9f9781ca67f35bd30c320964b24a8cbc2ca3d7bbd5345&idx=1&mid=2247483933&scene=21&sn=c2729ef1fd4a28f4707bb923a5ffae79#wechat_redirect)
+[https://mp.weixin.qq.com/s?\_\_biz=MzU2Mzk1NzkwOA%3D%3D&chksm=fc531be6cb2492f04475bac0fecbd1a9f9781ca67f35bd30c320964b24a8cbc2ca3d7bbd5345&idx=1&mid=2247483933&scene=21&sn=c2729ef1fd4a28f4707bb923a5ffae79#wechat_redirect](https://mp.weixin.qq.com/s?__biz=MzU2Mzk1NzkwOA%3D%3D&chksm=fc531be6cb2492f04475bac0fecbd1a9f9781ca67f35bd30c320964b24a8cbc2ca3d7bbd5345&idx=1&mid=2247483933&scene=21&sn=c2729ef1fd4a28f4707bb923a5ffae79#wechat_redirect)
