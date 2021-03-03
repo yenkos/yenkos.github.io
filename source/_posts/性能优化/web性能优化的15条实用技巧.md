@@ -257,6 +257,7 @@ function delegation(e, selector, callback) {
   ) {
     return;
   }
+
   if (typeof e.preventDefault === "function") {
     e.preventDefault();
     e.stopPropagation();
