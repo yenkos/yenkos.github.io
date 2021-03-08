@@ -243,7 +243,7 @@ if (current > 300) {
 
 如果有大量元素使用: hover, 那么会降低相应速度，CPU 升高
 
-> ⑤. 使用事件委托（通过事件冒泡实现）来减少事件处理器的数量，减少内存和处理时间
+> ⑤. 使用事件委托（通过事件冒泡实现）来减少事件 处理器的数量，减少内存和处理时间
 
 ```javascript
 function delegation(e, selector, callback) {
