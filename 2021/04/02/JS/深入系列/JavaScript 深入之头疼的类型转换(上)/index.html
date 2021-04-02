@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>Hexo</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Hexo"><meta name="msapplication-TileImage" content="/img/favicon.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Hexo"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="JavaScript 深入之头疼的类型转换(上)在 JavaScript 中，有一部分内容，情况复杂，容易出错，饱受争议但又应用广泛，这便是类型转换。 前言将值从一种类型转换为另一种类型通常称为类型转换。 ES6 前，JavaScript 共有六种数据类型：Undefined、Null、Boolean、Number、String、Object。 我们先捋一捋基本类型之间的转换。 原始值转布尔我们使"><meta property="og:type" content="blog"><meta property="og:title" content="Hexo"><meta property="og:url" content="http://example.com/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%20%E6%B7%B1%E5%85%A5%E4%B9%8B%E5%A4%B4%E7%96%BC%E7%9A%84%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2(%E4%B8%8A)/"><meta property="og:site_name" content="Hexo"><meta property="og:description" content="JavaScript 深入之头疼的类型转换(上)在 JavaScript 中，有一部分内容，情况复杂，容易出错，饱受争议但又应用广泛，这便是类型转换。 前言将值从一种类型转换为另一种类型通常称为类型转换。 ES6 前，JavaScript 共有六种数据类型：Undefined、Null、Boolean、Number、String、Object。 我们先捋一捋基本类型之间的转换。 原始值转布尔我们使"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://camo.githubusercontent.com/8c449ea45bde79874a7dfb630a0b6b1c565e693f30c019d3b2ed75ebc3e19d34/68747470733a2f2f67772e616c6963646e2e636f6d2f7466732f544231397932517a4b4c32674b306a535a506858586168765858612d313536322d3136302e6a7067#align=left&amp;display=inline&amp;height=160&amp;margin=%5Bobject%20Object%5D&amp;originHeight=160&amp;originWidth=1562&amp;status=done&amp;style=none&amp;width=1562"><meta property="og:image" content="https://camo.githubusercontent.com/9eb02e20b0786aba5eab6897f43502bba70aeddccdb2bff6bea24b8ec7824a70/68747470733a2f2f67772e616c6963646e2e636f6d2f7466732f544231654e6e597a486a31674b306a535a467558586372487058612d313830342d3136322e6a7067#align=left&amp;display=inline&amp;height=162&amp;margin=%5Bobject%20Object%5D&amp;originHeight=162&amp;originWidth=1804&amp;status=done&amp;style=none&amp;width=1804"><meta property="article:published_time" content="2021-04-02T02:17:35.427Z"><meta property="article:modified_time" content="2021-04-02T02:17:35.427Z"><meta property="article:author" content="yenkos"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="https://camo.githubusercontent.com/8c449ea45bde79874a7dfb630a0b6b1c565e693f30c019d3b2ed75ebc3e19d34/68747470733a2f2f67772e616c6963646e2e636f6d2f7466732f544231397932517a4b4c32674b306a535a506858586168765858612d313536322d3136302e6a7067#align=left&amp;display=inline&amp;height=160&amp;margin=%5Bobject%20Object%5D&amp;originHeight=160&amp;originWidth=1562&amp;status=done&amp;style=none&amp;width=1562"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://example.com/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%20%E6%B7%B1%E5%85%A5%E4%B9%8B%E5%A4%B4%E7%96%BC%E7%9A%84%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2(%E4%B8%8A)/"},"headline":"Hexo","image":[],"datePublished":"2021-04-02T02:17:35.427Z","dateModified":"2021-04-02T02:17:35.427Z","author":{"@type":"Person","name":"yenkos"},"description":"JavaScript 深入之头疼的类型转换(上)在 JavaScript 中，有一部分内容，情况复杂，容易出错，饱受争议但又应用广泛，这便是类型转换。 前言将值从一种类型转换为另一种类型通常称为类型转换。 ES6 前，JavaScript 共有六种数据类型：Undefined、Null、Boolean、Number、String、Object。 我们先捋一捋基本类型之间的转换。 原始值转布尔我们使"}</script><link rel="canonical" href="http://example.com/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%20%E6%B7%B1%E5%85%A5%E4%B9%8B%E5%A4%B4%E7%96%BC%E7%9A%84%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2(%E4%B8%8A)/"><link rel="icon" href="/img/favicon.svg"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/5.12.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css"><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script><!--!--><!--!--><meta name="generator" content="Hexo 5.4.0"></head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="Hexo" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">Home</a><a class="navbar-item" href="/archives">Archives</a><a class="navbar-item" href="/categories">Categories</a><a class="navbar-item" href="/tags">Tags</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/yenkos"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2021-04-02T02:17:35.427Z" title="4/2/2021, 2:17:35 AM">2021-04-02</time>发表</span><span class="level-item"><time dateTime="2021-04-02T02:17:35.427Z" title="4/2/2021, 2:17:35 AM">2021-04-02</time>更新</span><span class="level-item">24 分钟读完 (大约3626个字)</span></div></div><h1 class="title is-3 is-size-4-mobile"> </h1><div class="content"><h1 id="JavaScript-深入之头疼的类型转换-上"><a href="#JavaScript-深入之头疼的类型转换-上" class="headerlink" title="JavaScript 深入之头疼的类型转换(上)"></a>JavaScript 深入之头疼的类型转换(上)</h1><p>在 JavaScript 中，有一部分内容，情况复杂，容易出错，饱受争议但又应用广泛，这便是类型转换。</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>将值从一种类型转换为另一种类型通常称为类型转换。</p>
+<p>ES6 前，JavaScript 共有六种数据类型：Undefined、Null、Boolean、Number、String、Object。</p>
+<p>我们先捋一捋基本类型之间的转换。</p>
+<h2 id="原始值转布尔"><a href="#原始值转布尔" class="headerlink" title="原始值转布尔"></a>原始值转布尔</h2><p>我们使用 Boolean 函数将类型转换成布尔类型，在 JavaScript 中，只有 6 种值可以被转换成 false，其他都会被转换成 true。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Boolean</span>()) <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Boolean</span>(<span class="literal">false</span>)) <span class="comment">// false</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Boolean</span>(<span class="literal">undefined</span>)) <span class="comment">// false</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Boolean</span>(<span class="literal">null</span>)) <span class="comment">// false</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Boolean</span>(+<span class="number">0</span>)) <span class="comment">// false</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Boolean</span>(-<span class="number">0</span>)) <span class="comment">// false</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Boolean</span>(<span class="literal">NaN</span>)) <span class="comment">// false</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Boolean</span>(<span class="string">&quot;&quot;</span>)) <span class="comment">// false</span></span><br></pre></td></tr></table></figure>
+
+
+<p>注意，当 Boolean 函数不传任何参数时，会返回 false。</p>
+<h2 id="原始值转数字"><a href="#原始值转数字" class="headerlink" title="原始值转数字"></a>原始值转数字</h2><p>我们可以使用 Number 函数将类型转换成数字类型，如果参数无法被转换为数字，则返回 NaN。</p>
+<p>在看例子之前，我们先看 <a target="_blank" rel="noopener" href="http://es5.github.io/#x15.7.1.1">ES5 规范 15.7.1.1</a> 中关于 Number 的介绍：</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/8c449ea45bde79874a7dfb630a0b6b1c565e693f30c019d3b2ed75ebc3e19d34/68747470733a2f2f67772e616c6963646e2e636f6d2f7466732f544231397932517a4b4c32674b306a535a506858586168765858612d313536322d3136302e6a7067"><img src="https://camo.githubusercontent.com/8c449ea45bde79874a7dfb630a0b6b1c565e693f30c019d3b2ed75ebc3e19d34/68747470733a2f2f67772e616c6963646e2e636f6d2f7466732f544231397932517a4b4c32674b306a535a506858586168765858612d313536322d3136302e6a7067#align=left&display=inline&height=160&margin=%5Bobject%20Object%5D&originHeight=160&originWidth=1562&status=done&style=none&width=1562">
+</a></p>
+<p>根据规范，如果 Number 函数不传参数，返回 +0，如果有参数，调用 <code>ToNumber(value)</code>。</p>
+<p>注意这个 <code>ToNumber</code> 表示的是一个底层规范实现上的方法，并没有直接暴露出来。</p>
+<p>而 <code>ToNumber</code> 则直接给了一个<a target="_blank" rel="noopener" href="http://es5.github.io/#x9.3">对应的结果表</a>。表如下：</p>
+<table>
+<thead>
+<tr>
+<th>参数类型</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Undefined</td>
+<td>NaN</td>
+</tr>
+<tr>
+<td>Null</td>
+<td>+0</td>
+</tr>
+<tr>
+<td>Boolean</td>
+<td>如果参数是 true，返回 1。参数为 false，返回 +0</td>
+</tr>
+<tr>
+<td>Number</td>
+<td>返回与之相等的值</td>
+</tr>
+<tr>
+<td>String</td>
+<td>这段比较复杂，看例子</td>
+</tr>
+</tbody></table>
+<p>让我们写几个例子验证一下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>()) <span class="comment">// +0</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="literal">undefined</span>)) <span class="comment">// NaN</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="literal">null</span>)) <span class="comment">// +0</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="literal">false</span>)) <span class="comment">// +0</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="literal">true</span>)) <span class="comment">// 1</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="string">&quot;123&quot;</span>)) <span class="comment">// 123</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="string">&quot;-123&quot;</span>)) <span class="comment">// -123</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="string">&quot;1.2&quot;</span>)) <span class="comment">// 1.2</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="string">&quot;000123&quot;</span>)) <span class="comment">// 123</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="string">&quot;-000123&quot;</span>)) <span class="comment">// -123</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="string">&quot;0x11&quot;</span>)) <span class="comment">// 17</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="string">&quot;&quot;</span>)) <span class="comment">// 0</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="string">&quot; &quot;</span>)) <span class="comment">// 0</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="string">&quot;123 123&quot;</span>)) <span class="comment">// NaN</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="string">&quot;foo&quot;</span>)) <span class="comment">// NaN</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="string">&quot;100a&quot;</span>)) <span class="comment">// NaN</span></span><br></pre></td></tr></table></figure>
+
+
+<p>如果通过 Number 转换函数传入一个字符串，它会试图将其转换成一个整数或浮点数，而且会忽略所有前导的 0，如果有一个字符不是数字，结果都会返回 NaN，鉴于这种严格的判断，我们一般还会使用更加灵活的 parseInt 和 parseFloat 进行转换。</p>
+<p>parseInt 只解析整数，parseFloat 则可以解析整数和浮点数，如果字符串前缀是 “0x” 或者 “0X”，parseInt 将其解释为十六进制数，parseInt 和 parseFloat 都会跳过任意数量的前导空格，尽可能解析更多数值字符，并忽略后面的内容。如果第一个非空格字符是非法的数字直接量，将最终返回 NaN：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">parseInt</span>(<span class="string">&quot;3 abc&quot;</span>)) <span class="comment">// 3</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">parseFloat</span>(<span class="string">&quot;3.14 abc&quot;</span>)) <span class="comment">// 3.14</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">parseInt</span>(<span class="string">&quot;-12.34&quot;</span>)) <span class="comment">// -12</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">parseInt</span>(<span class="string">&quot;0xFF&quot;</span>)) <span class="comment">// 255</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">parseFloat</span>(<span class="string">&quot;.1&quot;</span>)) <span class="comment">// 0.1</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">parseInt</span>(<span class="string">&quot;0.1&quot;</span>)) <span class="comment">// 0</span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="原始值转字符"><a href="#原始值转字符" class="headerlink" title="原始值转字符"></a>原始值转字符</h2><p>我们使用 <code>String</code> 函数将类型转换成字符串类型，依然先看 <a target="_blank" rel="noopener" href="http://es5.github.io/#x15.5.1.1">规范 15.5.1.1</a>中有关 <code>String</code> 函数的介绍：</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/9eb02e20b0786aba5eab6897f43502bba70aeddccdb2bff6bea24b8ec7824a70/68747470733a2f2f67772e616c6963646e2e636f6d2f7466732f544231654e6e597a486a31674b306a535a467558586372487058612d313830342d3136322e6a7067"><img src="https://camo.githubusercontent.com/9eb02e20b0786aba5eab6897f43502bba70aeddccdb2bff6bea24b8ec7824a70/68747470733a2f2f67772e616c6963646e2e636f6d2f7466732f544231654e6e597a486a31674b306a535a467558586372487058612d313830342d3136322e6a7067#align=left&display=inline&height=162&margin=%5Bobject%20Object%5D&originHeight=162&originWidth=1804&status=done&style=none&width=1804">
+</a></p>
+<p>如果 <code>String</code> 函数不传参数，返回空字符串，如果有参数，调用 <code>ToString(value)</code>，而 <code>ToString</code> 也给了一个对应的结果表。表如下：</p>
+<table>
+<thead>
+<tr>
+<th>参数类型</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Undefined</td>
+<td>“undefined”</td>
+</tr>
+<tr>
+<td>Null</td>
+<td>“null”</td>
+</tr>
+<tr>
+<td>Boolean</td>
+<td>如果参数是 true，返回 “true”。参数为 false，返回 “false”</td>
+</tr>
+<tr>
+<td>Number</td>
+<td>又是比较复杂，可以看例子</td>
+</tr>
+<tr>
+<td>String</td>
+<td>返回与之相等的值</td>
+</tr>
+</tbody></table>
+<p>让我们写几个例子验证一下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">String</span>()) <span class="comment">// 空字符串</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">String</span>(<span class="literal">undefined</span>)) <span class="comment">// undefined</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">String</span>(<span class="literal">null</span>)) <span class="comment">// null</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">String</span>(<span class="literal">false</span>)) <span class="comment">// false</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">String</span>(<span class="literal">true</span>)) <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">String</span>(<span class="number">0</span>)) <span class="comment">// 0</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">String</span>(-<span class="number">0</span>)) <span class="comment">// 0</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">String</span>(<span class="literal">NaN</span>)) <span class="comment">// NaN</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">String</span>(<span class="literal">Infinity</span>)) <span class="comment">// Infinity</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">String</span>(-<span class="literal">Infinity</span>)) <span class="comment">// -Infinity</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">String</span>(<span class="number">1</span>)) <span class="comment">// 1</span></span><br></pre></td></tr></table></figure>
+
+
+<p>注意这里的 <code>ToString</code> 和上一节的 <code>ToNumber</code> 都是底层规范实现的方法，并没有直接暴露出来。</p>
+<h2 id="原始值转对象"><a href="#原始值转对象" class="headerlink" title="原始值转对象"></a>原始值转对象</h2><p>原始值到对象的转换非常简单，原始值通过调用 String()、Number() 或者 Boolean() 构造函数，转换为它们各自的包装对象。</p>
+<p>null 和 undefined 属于例外，当将它们用在期望是一个对象的地方都会造成一个类型错误 (TypeError) 异常，而不会执行正常的转换。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> a); <span class="comment">// number</span></span><br><span class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> <span class="built_in">Number</span>(a);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> b); <span class="comment">// object</span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="对象转布尔值"><a href="#对象转布尔值" class="headerlink" title="对象转布尔值"></a>对象转布尔值</h2><p>对象到布尔值的转换非常简单：所有对象 (包括数组和函数) 都转换为 true。对于包装对象也是这样，举个例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Boolean</span>(<span class="keyword">new</span> <span class="built_in">Boolean</span>(<span class="literal">false</span>))) <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="对象转字符串和数字"><a href="#对象转字符串和数字" class="headerlink" title="对象转字符串和数字"></a>对象转字符串和数字</h2><p>对象到字符串和对象到数字的转换都是通过调用待转换对象的一个方法来完成的。而 JavaScript 对象有两个不同的方法来执行转换，一个是 <code>toString</code>，一个是 <code>valueOf</code>。注意这个跟上面所说的 <code>ToString</code> 和 <code>ToNumber</code> 是不同的，这两个方法是真实暴露出来的方法。</p>
+<p>所有的对象除了 null 和 undefined 之外的任何值都具有 <code>toString</code> 方法，通常情况下，它和使用 String 方法返回的结果一致。<code>toString</code> 方法的作用在于返回一个反映这个对象的字符串，然而这才是情况复杂的开始。</p>
+<p>在<a target="_blank" rel="noopener" href="https://github.com/mqyqingfeng/Blog/issues/28">《JavaScript 专题之类型判断 (上)》</a>中讲到过 Object.prototype.toString 方法会根据这个对象的[[class]]内部属性，返回由 “[object “和 class 和”]” 三个部分组成的字符串。举个例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Object</span>.prototype.toString.call(&#123;<span class="attr">a</span>: <span class="number">1</span>&#125;) <span class="comment">// &quot;[object Object]&quot;</span></span><br><span class="line">(&#123;<span class="attr">a</span>: <span class="number">1</span>&#125;).toString() <span class="comment">// &quot;[object Object]&quot;</span></span><br><span class="line">(&#123;<span class="attr">a</span>: <span class="number">1</span>&#125;).toString === <span class="built_in">Object</span>.prototype.toString <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+
+<p>我们可以看出当调用对象的 toString 方法时，其实调用的是 Object.prototype 上的 toString 方法。</p>
+<p>然而 JavaScript 下的很多类根据各自的特点，定义了更多版本的 toString 方法。例如:</p>
+<ol>
+<li>数组的 toString 方法将每个数组元素转换成一个字符串，并在元素之间添加逗号后合并成结果字符串。</li>
+<li>函数的 toString 方法返回源代码字符串。</li>
+<li>日期的 toString 方法返回一个可读的日期和时间字符串。</li>
+<li>RegExp 的 toString 方法返回一个表示正则表达式直接量的字符串。</li>
+</ol>
+<p>读文字太抽象？我们直接写例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log((&#123;&#125;).toString()) <span class="comment">// [object Object]</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log([].toString()) <span class="comment">// &quot;&quot;</span></span><br><span class="line"><span class="built_in">console</span>.log([<span class="number">0</span>].toString()) <span class="comment">// 0</span></span><br><span class="line"><span class="built_in">console</span>.log([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>].toString()) <span class="comment">// 1,2,3</span></span><br><span class="line"><span class="built_in">console</span>.log((<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">var</span> a = <span class="number">1</span>;&#125;).toString()) <span class="comment">// function ()&#123;var a = 1;&#125;</span></span><br><span class="line"><span class="built_in">console</span>.log((<span class="regexp">/\d+/g</span>).toString()) <span class="comment">// /\d+/g</span></span><br><span class="line"><span class="built_in">console</span>.log((<span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2010</span>, <span class="number">0</span>, <span class="number">1</span>)).toString()) <span class="comment">// Fri Jan 01 2010 00:00:00 GMT+0800 (CST)</span></span><br></pre></td></tr></table></figure>
+
+
+<p>而另一个转换对象的函数是 valueOf，表示对象的原始值。默认的 valueOf 方法返回这个对象本身，数组、函数、正则简单的继承了这个默认方法，也会返回对象本身。日期是一个例外，它会返回它的一个内容表示: 1970 年 1 月 1 日以来的毫秒数。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> date = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2017</span>, <span class="number">4</span>, <span class="number">21</span>);</span><br><span class="line"><span class="built_in">console</span>.log(date.valueOf()) <span class="comment">// 1495296000000</span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="对象接着转字符串和数字"><a href="#对象接着转字符串和数字" class="headerlink" title="对象接着转字符串和数字"></a>对象接着转字符串和数字</h2><p>了解了 toString 方法和 valueOf 方法，我们分析下从对象到字符串是如何转换的。看规范 <a target="_blank" rel="noopener" href="http://es5.github.io/#x9.8">ES5 9.8</a>，其实就是 ToString 方法的对应表，只是这次我们加上 Object 的转换规则：</p>
+<table>
+<thead>
+<tr>
+<th>参数类型</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Object</td>
+<td>1. primValue = ToPrimitive(input, String)</td>
+</tr>
+<tr>
+<td>2. 返回 ToString(primValue).</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>所谓的 ToPrimitive 方法，其实就是输入一个值，然后返回一个一定是基本类型的值。</p>
+<p>我们总结一下，当我们用 String 方法转化一个值的时候，如果是基本类型，就参照 “原始值转字符” 这一节的对应表，如果不是基本类型，我们会将调用一个 ToPrimitive 方法，将其转为基本类型，然后再参照 “原始值转字符” 这一节的对应表进行转换。</p>
+<p>其实，从对象到数字的转换也是一样：</p>
+<table>
+<thead>
+<tr>
+<th>参数类型</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Object</td>
+<td>1. primValue = ToPrimitive(input, Number)</td>
+</tr>
+<tr>
+<td>2. 返回 ToNumber(primValue)。</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>虽然转换成基本值都会使用 ToPrimitive 方法，但传参有不同，最后的处理也有不同，转字符串调用的是 <code>ToString</code>，转数字调用 <code>ToNumber</code>。</p>
+<h2 id="ToPrimitive"><a href="#ToPrimitive" class="headerlink" title="ToPrimitive"></a>ToPrimitive</h2><p>那接下来就要看看 ToPrimitive 了，在了解了 toString 和 valueOf 方法后，这个也很简单。</p>
+<p>让我们看规范 9.1，函数语法表示如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ToPrimitive(input[, PreferredType])</span><br></pre></td></tr></table></figure>
+
+
+<p>第一个参数是 input，表示要处理的输入值。</p>
+<p>第二个参数是 PreferredType，非必填，表示希望转换成的类型，有两个值可以选，Number 或者 String。</p>
+<p>当不传入 PreferredType 时，如果 input 是日期类型，相当于传入 String，否则，都相当于传入 Number。</p>
+<p>如果传入的 input 是 Undefined、Null、Boolean、Number、String 类型，直接返回该值。</p>
+<p>如果是 ToPrimitive(obj, Number)，处理步骤如下：</p>
+<ol>
+<li>如果 obj 为 基本类型，直接返回</li>
+<li>否则，调用 valueOf 方法，如果返回一个原始值，则 JavaScript 将其返回。</li>
+<li>否则，调用 toString 方法，如果返回一个原始值，则 JavaScript 将其返回。</li>
+<li>否则，JavaScript 抛出一个类型错误异常。</li>
+</ol>
+<p>如果是 ToPrimitive(obj, String)，处理步骤如下：</p>
+<ol>
+<li>如果 obj 为 基本类型，直接返回</li>
+<li>否则，调用 toString 方法，如果返回一个原始值，则 JavaScript 将其返回。</li>
+<li>否则，调用 valueOf 方法，如果返回一个原始值，则 JavaScript 将其返回。</li>
+<li>否则，JavaScript 抛出一个类型错误异常。</li>
+</ol>
+<h2 id="对象转字符串"><a href="#对象转字符串" class="headerlink" title="对象转字符串"></a>对象转字符串</h2><p>所以总结下，对象转字符串 (就是 Number() 函数) 可以概括为：</p>
+<ol>
+<li>如果对象具有 toString 方法，则调用这个方法。如果他返回一个原始值，JavaScript 将这个值转换为字符串，并返回这个字符串结果。</li>
+<li>如果对象没有 toString 方法，或者这个方法并不返回一个原始值，那么 JavaScript 会调用 valueOf 方法。如果存在这个方法，则 JavaScript 调用它。如果返回值是原始值，JavaScript 将这个值转换为字符串，并返回这个字符串的结果。</li>
+<li>否则，JavaScript 无法从 toString 或者 valueOf 获得一个原始值，这时它将抛出一个类型错误异常。</li>
+</ol>
+<h2 id="对象转数字"><a href="#对象转数字" class="headerlink" title="对象转数字"></a>对象转数字</h2><p>对象转数字的过程中，JavaScript 做了同样的事情，只是它会首先尝试 valueOf 方法</p>
+<ol>
+<li>如果对象具有 valueOf 方法，且返回一个原始值，则 JavaScript 将这个原始值转换为数字并返回这个数字</li>
+<li>否则，如果对象具有 toString 方法，且返回一个原始值，则 JavaScript 将其转换并返回。</li>
+<li>否则，JavaScript 抛出一个类型错误异常。</li>
+</ol>
+<p>举个例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(&#123;&#125;)) <span class="comment">// NaN</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(&#123;<span class="attr">a</span> : <span class="number">1</span>&#125;)) <span class="comment">// NaN</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>([])) <span class="comment">// 0</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>([<span class="number">0</span>])) <span class="comment">// 0</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])) <span class="comment">// NaN</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="keyword">var</span> a = <span class="number">1</span>;&#125;)) <span class="comment">// NaN</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="regexp">/\d+/g</span>)) <span class="comment">// NaN</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2010</span>, <span class="number">0</span>, <span class="number">1</span>))) <span class="comment">// 1262275200000</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">Number</span>(<span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">&#x27;a&#x27;</span>))) <span class="comment">// NaN</span></span><br></pre></td></tr></table></figure>
+
+
+<p>注意，在这个例子中，<code>[]</code> 和 <code>[0]</code> 都返回了 0，而 <code>[1, 2, 3]</code> 却返回了一个 NaN。我们分析一下原因：</p>
+<p>当我们 <code>Number([])</code> 的时候，先调用 <code>[]</code> 的 <code>valueOf</code> 方法，此时返回 <code>[]</code>，因为返回了一个对象而不是原始值，所以又调用了 <code>toString</code> 方法，此时返回一个空字符串，接下来调用 <code>ToNumber</code> 这个规范上的方法，参照对应表，转换为 <code>0</code>, 所以最后的结果为 <code>0</code>。</p>
+<p>而当我们 <code>Number([1, 2, 3])</code> 的时候，先调用 <code>[1, 2, 3]</code> 的 <code>valueOf</code> 方法，此时返回 <code>[1, 2, 3]</code>，再调用 <code>toString</code> 方法，此时返回 <code>1,2,3</code>，接下来调用 <code>ToNumber</code>，参照对应表，因为无法转换为数字，所以最后的结果为 <code>NaN</code>。</p>
+<h2 id="JSON-stringify"><a href="#JSON-stringify" class="headerlink" title="JSON.stringify"></a>JSON.stringify</h2><p>值得一提的是：JSON.stringify() 方法可以将一个 JavaScript 值转换为一个 JSON 字符串，实现上也是调用了 toString 方法，也算是一种类型转换的方法。下面讲一讲 JSON.stringify 的注意要点：</p>
+<ol>
+<li>处理基本类型时，与使用 toString 基本相同，结果都是字符串，除了 undefined</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">JSON</span>.stringify(<span class="literal">null</span>)) <span class="comment">// null</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">JSON</span>.stringify(<span class="literal">undefined</span>)) <span class="comment">// undefined，注意这个undefined不是字符串的undefined</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">JSON</span>.stringify(<span class="literal">true</span>)) <span class="comment">// true</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">JSON</span>.stringify(<span class="number">42</span>)) <span class="comment">// 42</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">JSON</span>.stringify(<span class="string">&quot;42&quot;</span>)) <span class="comment">// &quot;42&quot;</span></span><br></pre></td></tr></table></figure>
+
+
+<ol start="2">
+<li>布尔值、数字、字符串的包装对象在序列化过程中会自动转换成对应的原始值。</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">JSON</span>.stringify([<span class="keyword">new</span> <span class="built_in">Number</span>(<span class="number">1</span>), <span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">&quot;false&quot;</span>), <span class="keyword">new</span> <span class="built_in">Boolean</span>(<span class="literal">false</span>)]); <span class="comment">// &quot;[1,&quot;false&quot;,false]&quot;</span></span><br></pre></td></tr></table></figure>
+
+
+<p>3.undefined、任意的函数以及 symbol 值，在序列化过程中会被忽略（出现在非数组对象的属性值中时）或者被转换成 null（出现在数组中时）。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">JSON</span>.stringify(&#123;<span class="attr">x</span>: <span class="literal">undefined</span>, <span class="attr">y</span>: <span class="built_in">Object</span>, <span class="attr">z</span>: <span class="built_in">Symbol</span>(<span class="string">&quot;&quot;</span>)&#125;); </span><br><span class="line"><span class="comment">// &quot;&#123;&#125;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">JSON</span>.stringify([<span class="literal">undefined</span>, <span class="built_in">Object</span>, <span class="built_in">Symbol</span>(<span class="string">&quot;&quot;</span>)]);          </span><br><span class="line"><span class="comment">// &quot;[null,null,null]&quot;</span></span><br></pre></td></tr></table></figure>
+
+
+<p>4.JSON.stringify 有第二个参数 replacer，它可以是数组或者函数，用来指定对象序列化过程中哪些属性应该被处理，哪些应该被排除。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">replacer</span>(<span class="params">key, value</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> value === <span class="string">&quot;string&quot;</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">undefined</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> value;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> foo = &#123;<span class="attr">foundation</span>: <span class="string">&quot;Mozilla&quot;</span>, <span class="attr">model</span>: <span class="string">&quot;box&quot;</span>, <span class="attr">week</span>: <span class="number">45</span>, <span class="attr">transport</span>: <span class="string">&quot;car&quot;</span>, <span class="attr">month</span>: <span class="number">7</span>&#125;;</span><br><span class="line"><span class="keyword">var</span> jsonString = <span class="built_in">JSON</span>.stringify(foo, replacer);</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(jsonString)</span><br><span class="line"><span class="comment">// &#123;&quot;week&quot;:45,&quot;month&quot;:7&#125;</span></span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> foo = &#123;<span class="attr">foundation</span>: <span class="string">&quot;Mozilla&quot;</span>, <span class="attr">model</span>: <span class="string">&quot;box&quot;</span>, <span class="attr">week</span>: <span class="number">45</span>, <span class="attr">transport</span>: <span class="string">&quot;car&quot;</span>, <span class="attr">month</span>: <span class="number">7</span>&#125;;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="built_in">JSON</span>.stringify(foo, [<span class="string">&#x27;week&#x27;</span>, <span class="string">&#x27;month&#x27;</span>]));</span><br><span class="line"><span class="comment">// &#123;&quot;week&quot;:45,&quot;month&quot;:7&#125;</span></span><br></pre></td></tr></table></figure>
+
+
+<ol start="5">
+<li>如果一个被序列化的对象拥有 toJSON 方法，那么该 toJSON 方法就会覆盖该对象默认的序列化行为：不是那个对象被序列化，而是调用 toJSON 方法后的返回值会被序列化，例如：</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> obj = &#123;</span><br><span class="line">  foo: <span class="string">&#x27;foo&#x27;</span>,</span><br><span class="line">  toJSON: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;bar&#x27;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="built_in">JSON</span>.stringify(obj);      <span class="comment">// &#x27;&quot;bar&quot;&#x27;</span></span><br><span class="line"><span class="built_in">JSON</span>.stringify(&#123;<span class="attr">x</span>: obj&#125;); <span class="comment">// &#x27;&#123;&quot;x&quot;:&quot;bar&quot;&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id=""><a href="#" class="headerlink" title=""></a></h2></div><div class="article-licensing box"><div class="licensing-title"><p><a href="http://example.com/2021/04/02/JS/深入系列/JavaScript 深入之头疼的类型转换(上)/">http://example.com/2021/04/02/JS/深入系列/JavaScript 深入之头疼的类型转换(上)/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>yenkos</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2021-04-02</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2021-04-02</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icon" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a><a class="icon" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a><a class="icon" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><!--!--></article></div><!--!--><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/2021/04/02/%E7%AE%97%E6%B3%95/%E7%BB%8F%E5%85%B8%E9%A2%98%E8%A7%A3-%E5%9B%9E%E6%BA%AF%E6%B3%95%E5%92%8C%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">经典题解-回溯法和动态规划</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%20%E6%B7%B1%E5%85%A5%E4%B9%8B%E6%B5%AE%E7%82%B9%E6%95%B0%E7%B2%BE%E5%BA%A6/"><span class="level-item"> </span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">评论</h3><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/disqusjs@1.2.5/dist/disqusjs.css"><div id="disqus_thread"><noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div><script src="https://cdn.jsdelivr.net/npm/disqusjs@1.2.5/dist/disqus.js"></script><script>new DisqusJS({
+            shortname: 'my-blog',
+            apikey: "FHN404hDCq4UjybTvgSB9BvK8YtZOMlL7ngYZD4WUHD3N4DwKKouLCjZ3nJyHLgB",
+            siteName: "Hexo",
+            identifier: "2021/04/02/JS/深入系列/JavaScript 深入之头疼的类型转换(上)/",
+            url: "http://example.com/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%20%E6%B7%B1%E5%85%A5%E4%B9%8B%E5%A4%B4%E7%96%BC%E7%9A%84%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2(%E4%B8%8A)/",
+            
+            
+            
+            
+            
+        });</script></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-4-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar" src="https://avatars1.githubusercontent.com/u/69024391?s=400&amp;u=5502f30feb22d546ebcc47b9ccf260348485ca17&amp;v=4" alt="Yenkos"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">Yenkos</p><p class="is-size-6 is-block">Time.</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>GUANG ZHOU</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives"><p class="title">35</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories"><p class="title">7</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags"><p class="title">13</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/yenkos" target="_blank" rel="noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Github" href="https://github.com/yenkos"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Facebook" href="https://facebook.com"><i class="fab fa-facebook"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Twitter" href="https://twitter.com"><i class="fab fa-twitter"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Dribbble" href="https://dribbble.com"><i class="fab fa-dribbble"></i></a></div></div></div><!--!--><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/Javascript/"><span class="level-start"><span class="level-item">Javascript</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/VUE/"><span class="level-start"><span class="level-item">VUE</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E4%B8%9A%E5%8A%A1/"><span class="level-start"><span class="level-item">业务</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%B7%A5%E7%A8%8B%E5%8C%96/"><span class="level-start"><span class="level-item">工程化</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="/categories/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/"><span class="level-start"><span class="level-item">性能优化</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%AE%97%E6%B3%95/"><span class="level-start"><span class="level-item">算法</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%BC%96%E7%A8%8B/"><span class="level-start"><span class="level-item">编程</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-04-02T02:17:35.427Z">2021-04-02</time></p><p class="title"><a href="/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%E6%B7%B1%E5%85%A5%E4%B9%8Bnew%E7%9A%84%E6%A8%A1%E6%8B%9F%E5%AE%9E%E7%8E%B0/"> </a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-04-02T02:17:35.427Z">2021-04-02</time></p><p class="title"><a href="/2021/04/02/CSS/CSS%20%E5%8F%98%E9%87%8F%E5%8F%8A%E5%85%B6%E5%BA%94%E7%94%A8/">CSS 变量及其应用</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-04-02T02:17:35.427Z">2021-04-02</time></p><p class="title"><a href="/2021/04/02/JS/JS%20%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF%E5%92%8C%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5/">事件循环和同步异步</a></p><p class="categories"><a href="/categories/Javascript/">Javascript</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-04-02T02:17:35.427Z">2021-04-02</time></p><p class="title"><a href="/2021/04/02/JS/JS%E5%B8%B8%E7%94%A8%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%80%EF%BC%89/">JS常用实现（一）</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-04-02T02:17:35.427Z">2021-04-02</time></p><p class="title"><a href="/2021/04/02/VUE/Vue%E6%80%A7%E8%83%BD%E6%8F%90%E5%8D%87%E4%B9%8BObject.freeze()/">Vue性能提升之Object.freeze()</a></p><p class="categories"><a href="/categories/VUE/">VUE</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2021/04/"><span class="level-start"><span class="level-item">四月 2021</span></span><span class="level-end"><span class="level-item tag">34</span></span></a></li><li><a class="level is-mobile" href="/archives/2017/11/"><span class="level-start"><span class="level-item">十一月 2017</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/Javascript/"><span class="tag">Javascript</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/VUE/"><span class="tag">VUE</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/html/"><span class="tag">html</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/nodejs/"><span class="tag">nodejs</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/npm/"><span class="tag">npm</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/rollup/"><span class="tag">rollup</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/shell/"><span class="tag">shell</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%B7%A5%E7%A8%8B%E5%8C%96/"><span class="tag">工程化</span><span class="tag">6</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/"><span class="tag">性能优化</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%99%BB%E5%BD%95/"><span class="tag">登录</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%AE%97%E6%B3%95/"><span class="tag">算法</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%BC%96%E7%A8%8B/"><span class="tag">编程</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E9%89%B4%E6%9D%83/"><span class="tag">鉴权</span><span class="tag">1</span></a></div></div></div></div></div></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="Hexo" height="28"></a><p class="is-size-7"><span>&copy; 2021 yenkos</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("zh-CN");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "此网站使用Cookie来改善您的体验。",
+          dismiss: "知道了！",
+          allow: "允许使用Cookie",
+          deny: "拒绝",
+          link: "了解更多",
+          policy: "Cookie政策",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>

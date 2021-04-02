@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>Hexo</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Hexo"><meta name="msapplication-TileImage" content="/img/favicon.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Hexo"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="JavaScript深入之从ECMAScript规范解读this前言在《JavaScript 深入之执行上下文栈》中讲到，当 JavaScript 代码执行一段可执行代码 (executable code) 时，会创建对应的执行上下文(execution context)。 对于每个执行上下文，都有三个重要属性  变量对象 (Variable object，VO) 作用域链 (Scope chai"><meta property="og:type" content="blog"><meta property="og:title" content="Hexo"><meta property="og:url" content="http://example.com/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%E6%B7%B1%E5%85%A5%E4%B9%8B%E4%BB%8EECMAScript%E8%A7%84%E8%8C%83%E8%A7%A3%E8%AF%BBthis/"><meta property="og:site_name" content="Hexo"><meta property="og:description" content="JavaScript深入之从ECMAScript规范解读this前言在《JavaScript 深入之执行上下文栈》中讲到，当 JavaScript 代码执行一段可执行代码 (executable code) 时，会创建对应的执行上下文(execution context)。 对于每个执行上下文，都有三个重要属性  变量对象 (Variable object，VO) 作用域链 (Scope chai"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="http://example.com/img/og_image.png"><meta property="article:published_time" content="2021-04-02T02:17:35.427Z"><meta property="article:modified_time" content="2021-04-02T02:17:35.427Z"><meta property="article:author" content="yenkos"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="/img/og_image.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://example.com/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%E6%B7%B1%E5%85%A5%E4%B9%8B%E4%BB%8EECMAScript%E8%A7%84%E8%8C%83%E8%A7%A3%E8%AF%BBthis/"},"headline":"Hexo","image":["http://example.com/img/og_image.png"],"datePublished":"2021-04-02T02:17:35.427Z","dateModified":"2021-04-02T02:17:35.427Z","author":{"@type":"Person","name":"yenkos"},"description":"JavaScript深入之从ECMAScript规范解读this前言在《JavaScript 深入之执行上下文栈》中讲到，当 JavaScript 代码执行一段可执行代码 (executable code) 时，会创建对应的执行上下文(execution context)。 对于每个执行上下文，都有三个重要属性  变量对象 (Variable object，VO) 作用域链 (Scope chai"}</script><link rel="canonical" href="http://example.com/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%E6%B7%B1%E5%85%A5%E4%B9%8B%E4%BB%8EECMAScript%E8%A7%84%E8%8C%83%E8%A7%A3%E8%AF%BBthis/"><link rel="icon" href="/img/favicon.svg"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/5.12.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css"><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script><!--!--><!--!--><meta name="generator" content="Hexo 5.4.0"></head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="Hexo" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">Home</a><a class="navbar-item" href="/archives">Archives</a><a class="navbar-item" href="/categories">Categories</a><a class="navbar-item" href="/tags">Tags</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/yenkos"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2021-04-02T02:17:35.427Z" title="4/2/2021, 2:17:35 AM">2021-04-02</time>发表</span><span class="level-item"><time dateTime="2021-04-02T02:17:35.427Z" title="4/2/2021, 2:17:35 AM">2021-04-02</time>更新</span><span class="level-item">19 分钟读完 (大约2811个字)</span></div></div><h1 class="title is-3 is-size-4-mobile"> </h1><div class="content"><h1 id="JavaScript深入之从ECMAScript规范解读this"><a href="#JavaScript深入之从ECMAScript规范解读this" class="headerlink" title="JavaScript深入之从ECMAScript规范解读this"></a>JavaScript深入之从ECMAScript规范解读this</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在《JavaScript 深入之执行上下文栈》中讲到，当 JavaScript 代码执行一段可执行代码 (executable code) 时，会创建对应的执行上下文(execution context)。</p>
+<p>对于每个执行上下文，都有三个重要属性</p>
+<ul>
+<li>变量对象 (Variable object，VO)</li>
+<li>作用域链 (Scope chain)</li>
+<li>this</li>
+</ul>
+<p>今天重点讲讲 this，然而不好讲。</p>
+<p>……</p>
+<p>因为我们要从 ECMASciript5 规范开始讲起。</p>
+<p>先奉上 ECMAScript 5.1 规范地址：</p>
+<p>英文版：<a target="_blank" rel="noopener" href="http://es5.github.io/#x15.1">http://es5.github.io/#x15.1</a></p>
+<p>中文版：<a target="_blank" rel="noopener" href="http://yanhaijing.com/es5/#115">http://yanhaijing.com/es5/#115</a></p>
+<p>让我们开始了解规范吧！</p>
+<h2 id="Types"><a href="#Types" class="headerlink" title="Types"></a>Types</h2><p>首先是第 8 章 Types：</p>
+<blockquote>
+<p>Types are further subclassified into ECMAScript language types and specification types.</p>
+</blockquote>
+<blockquote>
+<p>An ECMAScript language type corresponds to values that are directly manipulated by an ECMAScript programmer using the ECMAScript language. The ECMAScript language types are Undefined, Null, Boolean, String, Number, and Object.</p>
+</blockquote>
+<blockquote>
+<p>A specification type corresponds to meta-values that are used within algorithms to describe the semantics of ECMAScript language constructs and ECMAScript language types. The specification types are Reference, List, Completion, Property Descriptor, Property Identifier, Lexical Environment, and Environment Record.</p>
+</blockquote>
+<p>我们简单的翻译一下：</p>
+<p>ECMAScript 的类型分为语言类型和规范类型。</p>
+<p>ECMAScript 语言类型是开发者直接使用 ECMAScript 可以操作的。其实就是我们常说的 Undefined, Null, Boolean, String, Number, 和 Object。</p>
+<p>而规范类型相当于 meta-values，是用来用算法描述 ECMAScript 语言结构和 ECMAScript 语言类型的。规范类型包括：Reference, List, Completion, Property Descriptor, Property Identifier, Lexical Environment, 和 Environment Record。</p>
+<p>没懂？没关系，我们只要知道在 ECMAScript 规范中还有一种只存在于规范中的类型，它们的作用是用来描述语言底层行为逻辑。</p>
+<p>今天我们要讲的重点是便是其中的 Reference 类型。它与 this 的指向有着密切的关联。</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p>那什么又是 Reference ？</p>
+<p>让我们看 8.7 章 The Reference Specification Type：</p>
+<blockquote>
+<p>The Reference type is used to explain the behaviour of such operators as delete, typeof, and the assignment operators.</p>
+</blockquote>
+<p>所以 Reference 类型就是用来解释诸如 delete、typeof 以及赋值等操作行为的。</p>
+<p>抄袭尤雨溪大大的话，就是：</p>
+<blockquote>
+<p>这里的 Reference 是一个 Specification Type，也就是 “只存在于规范里的抽象类型”。它们是为了更好地描述语言的底层行为逻辑才存在的，但并不存在于实际的 js 代码中。</p>
+</blockquote>
+<p>再看接下来的这段具体介绍 Reference 的内容：</p>
+<blockquote>
+<p>A Reference is a resolved name binding.</p>
+</blockquote>
+<blockquote>
+<p>A Reference consists of three components, the base value, the referenced name and the Boolean valued strict reference flag.</p>
+</blockquote>
+<blockquote>
+<p>The base value is either undefined, an Object, a Boolean, a String, a Number, or an environment record (10.2.1).</p>
+</blockquote>
+<blockquote>
+<p>A base value of undefined indicates that the reference could not be resolved to a binding. The referenced name is a String.</p>
+</blockquote>
+<p>这段讲述了 Reference 的构成，由三个组成部分，分别是：</p>
+<ul>
+<li>base value</li>
+<li>referenced name</li>
+<li>strict reference</li>
+</ul>
+<p>可是这些到底是什么呢？</p>
+<p>我们简单的理解的话：</p>
+<p>base value 就是属性所在的对象或者就是 EnvironmentRecord，它的值只可能是 undefined, an Object, a Boolean, a String, a Number, or an environment record 其中的一种。</p>
+<p>referenced name 就是属性的名称。</p>
+<p>举个例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> foo = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 对应的Reference是：</span></span><br><span class="line"><span class="keyword">var</span> fooReference = &#123;</span><br><span class="line">    base: EnvironmentRecord,</span><br><span class="line">    name: <span class="string">&#x27;foo&#x27;</span>,</span><br><span class="line">    strict: <span class="literal">false</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+<p>再举个例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> foo = &#123;</span><br><span class="line">    bar: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line">foo.bar(); <span class="comment">// foo</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// bar对应的Reference是：</span></span><br><span class="line"><span class="keyword">var</span> BarReference = &#123;</span><br><span class="line">    base: foo,</span><br><span class="line">    propertyName: <span class="string">&#x27;bar&#x27;</span>,</span><br><span class="line">    strict: <span class="literal">false</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+<p>而且规范中还提供了获取 Reference 组成部分的方法，比如 GetBase 和 IsPropertyReference。</p>
+<p>这两个方法很简单，简单看一看：</p>
+<p>1.GetBase</p>
+<blockquote>
+<p>GetBase(V). Returns the base value component of the reference V.</p>
+</blockquote>
+<p>返回 reference 的 base value。</p>
+<p>2.IsPropertyReference</p>
+<blockquote>
+<p>IsPropertyReference(V). Returns true if either the base value is an object or HasPrimitiveBase(V) is true; otherwise returns false.</p>
+</blockquote>
+<p>简单的理解：如果 base value 是一个对象，就返回 true。</p>
+<h2 id="GetValue"><a href="#GetValue" class="headerlink" title="GetValue"></a>GetValue</h2><p>除此之外，紧接着在 8.7.1 章规范中就讲了一个用于从 Reference 类型获取对应值的方法： GetValue。</p>
+<p>简单模拟 GetValue 的使用：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> foo = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> fooReference = &#123;</span><br><span class="line">    base: EnvironmentRecord,</span><br><span class="line">    name: <span class="string">&#x27;foo&#x27;</span>,</span><br><span class="line">    strict: <span class="literal">false</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">GetValue(fooReference) <span class="comment">// 1;</span></span><br></pre></td></tr></table></figure>
+
+
+<p>GetValue 返回对象属性真正的值，但是要注意：</p>
+<p><strong>调用 GetValue，返回的将是具体的值，而不再是一个 Reference</strong></p>
+<p>这个很重要，这个很重要，这个很重要。</p>
+<h2 id="如何确定-this-的值"><a href="#如何确定-this-的值" class="headerlink" title="如何确定 this 的值"></a>如何确定 this 的值</h2><p>关于 Reference 讲了那么多，为什么要讲 Reference 呢？到底 Reference 跟本文的主题 this 有哪些关联呢？如果你能耐心看完之前的内容，以下开始进入高能阶段：</p>
+<p>看规范 11.2.3 Function Calls：</p>
+<p>这里讲了当函数调用的时候，如何确定 this 的取值。</p>
+<p>只看第一步、第六步、第七步：</p>
+<blockquote>
+<p>1.Let <em>ref</em> be the result of evaluating MemberExpression.</p>
+</blockquote>
+<blockquote>
+<p>6.If Type(<em>ref</em>) is Reference, then</p>
+</blockquote>
+<blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a.If IsPropertyReference(ref) is true, then</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">i.Let thisValue be GetBase(ref).</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">b.Else, the base of ref is an Environment Record</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">i.Let thisValue be the result of calling the ImplicitThisValue concrete method of GetBase(ref).</span><br></pre></td></tr></table></figure>
+<p>7.Else, Type(<em>ref</em>) is not Reference.</p>
+</blockquote>
+<blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a. Let thisValue be undefined.</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p>让我们描述一下：</p>
+<ol>
+<li>计算 MemberExpression 的结果赋值给 ref</li>
+</ol>
+<ol start="2">
+<li>判断 ref 是不是一个 Reference 类型</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">2.1 如果 ref 是 Reference，并且 IsPropertyReference(ref) 是 true, 那么 this 的值为 GetBase(ref)</span><br><span class="line"></span><br><span class="line">2.2 如果 ref 是 Reference，并且 base value 值是 Environment Record, 那么this的值为 ImplicitThisValue(ref)</span><br><span class="line"></span><br><span class="line">2.3 如果 ref 不是 Reference，那么 this 的值为 undefined</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="具体分析"><a href="#具体分析" class="headerlink" title="具体分析"></a>具体分析</h2><p>让我们一步一步看：</p>
+<ol>
+<li>计算 MemberExpression 的结果赋值给 ref</li>
+</ol>
+<p>什么是 MemberExpression？看规范 11.2 Left-Hand-Side Expressions：</p>
+<p>MemberExpression :</p>
+<ul>
+<li>PrimaryExpression // 原始表达式 可以参见《JavaScript 权威指南第四章》</li>
+<li>FunctionExpression // 函数定义表达式</li>
+<li>MemberExpression [ Expression ] // 属性访问表达式</li>
+<li>MemberExpression . IdentifierName // 属性访问表达式</li>
+<li>new MemberExpression Arguments // 对象创建表达式</li>
+</ul>
+<p>举个例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="built_in">this</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">foo(); <span class="comment">// MemberExpression 是 foo</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="built_in">this</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">foo()(); <span class="comment">// MemberExpression 是 foo()</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> foo = &#123;</span><br><span class="line">    bar: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">foo.bar(); <span class="comment">// MemberExpression 是 foo.bar</span></span><br></pre></td></tr></table></figure>
+
+
+<p>所以简单理解 MemberExpression 其实就是 () 左边的部分。</p>
+<ol start="2">
+<li>判断 ref 是不是一个 Reference 类型。</li>
+</ol>
+<p>关键就在于看规范是如何处理各种 MemberExpression，返回的结果是不是一个 Reference 类型。</p>
+<p>举最后一个例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> value = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> foo = &#123;</span><br><span class="line">  value: <span class="number">2</span>,</span><br><span class="line">  bar: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">this</span>.value;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//示例1</span></span><br><span class="line"><span class="built_in">console</span>.log(foo.bar());</span><br><span class="line"><span class="comment">//示例2</span></span><br><span class="line"><span class="built_in">console</span>.log((foo.bar)());</span><br><span class="line"><span class="comment">//示例3</span></span><br><span class="line"><span class="built_in">console</span>.log((foo.bar = foo.bar)());</span><br><span class="line"><span class="comment">//示例4</span></span><br><span class="line"><span class="built_in">console</span>.log((<span class="literal">false</span> || foo.bar)());</span><br><span class="line"><span class="comment">//示例5</span></span><br><span class="line"><span class="built_in">console</span>.log((foo.bar, foo.bar)());</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="foo-bar"><a href="#foo-bar" class="headerlink" title="foo.bar()"></a>foo.bar()</h3><p>在示例 1 中，MemberExpression 计算的结果是 foo.bar，那么 foo.bar 是不是一个 Reference 呢？</p>
+<p>查看规范 11.2.1 Property Accessors，这里展示了一个计算的过程，什么都不管了，就看最后一步：</p>
+<blockquote>
+<p>Return a value of type Reference whose base value is baseValue and whose referenced name is propertyNameString, and whose strict mode flag is strict.</p>
+</blockquote>
+<p>我们得知该表达式返回了一个 Reference 类型！</p>
+<p>根据之前的内容，我们知道该值为：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> Reference = &#123;</span><br><span class="line">  base: foo,</span><br><span class="line">  name: <span class="string">&#x27;bar&#x27;</span>,</span><br><span class="line">  strict: <span class="literal">false</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+<p>接下来按照 2.1 的判断流程走：</p>
+<blockquote>
+<p>2.1 如果 ref 是 Reference，并且 IsPropertyReference(ref) 是 true, 那么 this 的值为 GetBase(ref)</p>
+</blockquote>
+<p>该值是 Reference 类型，那么 IsPropertyReference(ref) 的结果是多少呢？</p>
+<p>前面我们已经铺垫了 IsPropertyReference 方法，如果 base value 是一个对象，结果返回 true。</p>
+<p>base value 为 foo，是一个对象，所以 IsPropertyReference(ref) 结果为 true。</p>
+<p>这个时候我们就可以确定 this 的值了：</p>
+<p>GetBase 也已经铺垫了，获得 base value 值，这个例子中就是 foo，所以 this 的值就是 foo ，示例 1 的结果就是 2！</p>
+<p>唉呀妈呀，为了证明 this 指向 foo，真是累死我了！但是知道了原理，剩下的就更快了。</p>
+<h3 id="foo-bar-1"><a href="#foo-bar-1" class="headerlink" title="(foo.bar)()"></a>(foo.bar)()</h3><p>看示例 2：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log((foo.bar)());</span><br></pre></td></tr></table></figure>
+
+
+<p>foo.bar 被 () 包住，查看规范 11.1.6 The Grouping Operator</p>
+<p>直接看结果部分：</p>
+<blockquote>
+<p>Return the result of evaluating Expression. This may be of type Reference.</p>
+</blockquote>
+<blockquote>
+<p>NOTE This algorithm does not apply GetValue to the result of evaluating Expression.</p>
+</blockquote>
+<p>实际上 () 并没有对 MemberExpression 进行计算，所以其实跟示例 1 的结果是一样的。</p>
+<h3 id="foo-bar-foo-bar"><a href="#foo-bar-foo-bar" class="headerlink" title="(foo.bar = foo.bar)()"></a>(foo.bar = foo.bar)()</h3><p>看示例 3，有赋值操作符，查看规范 11.13.1 Simple Assignment (=):</p>
+<p>计算的第三步：</p>
+<blockquote>
+<p>3.Let rval be GetValue(rref).</p>
+</blockquote>
+<p>因为使用了 GetValue，所以返回的值不是 Reference 类型，</p>
+<p>按照之前讲的判断逻辑：</p>
+<blockquote>
+<p>2.3 如果 ref 不是 Reference，那么 this 的值为 undefined</p>
+</blockquote>
+<p>this 为 undefined，非严格模式下，this 的值为 undefined 的时候，其值会被隐式转换为全局对象。</p>
+<h3 id="false-foo-bar"><a href="#false-foo-bar" class="headerlink" title="(false || foo.bar)()"></a>(false || foo.bar)()</h3><p>看示例 4，逻辑与算法，查看规范 11.11 Binary Logical Operators：</p>
+<p>计算第二步：</p>
+<blockquote>
+<p>2.Let lval be GetValue(lref).</p>
+</blockquote>
+<p>因为使用了 GetValue，所以返回的不是 Reference 类型，this 为 undefined</p>
+<h3 id="foo-bar-foo-bar-1"><a href="#foo-bar-foo-bar-1" class="headerlink" title="(foo.bar, foo.bar)()"></a>(foo.bar, foo.bar)()</h3><p>看示例 5，逗号操作符，查看规范 11.14 Comma Operator (,)</p>
+<p>计算第二步：</p>
+<blockquote>
+<p>2.Call GetValue(lref).</p>
+</blockquote>
+<p>因为使用了 GetValue，所以返回的不是 Reference 类型，this 为 undefined</p>
+<h3 id="揭晓结果"><a href="#揭晓结果" class="headerlink" title="揭晓结果"></a>揭晓结果</h3><p>所以最后一个例子的结果是：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> value = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> foo = &#123;</span><br><span class="line">  value: <span class="number">2</span>,</span><br><span class="line">  bar: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">this</span>.value;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//示例1</span></span><br><span class="line"><span class="built_in">console</span>.log(foo.bar()); <span class="comment">// 2</span></span><br><span class="line"><span class="comment">//示例2</span></span><br><span class="line"><span class="built_in">console</span>.log((foo.bar)()); <span class="comment">// 2</span></span><br><span class="line"><span class="comment">//示例3</span></span><br><span class="line"><span class="built_in">console</span>.log((foo.bar = foo.bar)()); <span class="comment">// 1</span></span><br><span class="line"><span class="comment">//示例4</span></span><br><span class="line"><span class="built_in">console</span>.log((<span class="literal">false</span> || foo.bar)()); <span class="comment">// 1</span></span><br><span class="line"><span class="comment">//示例5</span></span><br><span class="line"><span class="built_in">console</span>.log((foo.bar, foo.bar)()); <span class="comment">// 1</span></span><br></pre></td></tr></table></figure>
+
+
+<p>注意：以上是在非严格模式下的结果，严格模式下因为 this 返回 undefined，所以示例 3 会报错。</p>
+<h3 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h3><p>最最后，忘记了一个最最普通的情况：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="built_in">this</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">foo();</span><br></pre></td></tr></table></figure>
+
+
+<p>MemberExpression 是 foo，解析标识符，查看规范 10.3.1 Identifier Resolution，会返回一个 Reference 类型的值：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> fooReference = &#123;</span><br><span class="line">    base: EnvironmentRecord,</span><br><span class="line">    name: <span class="string">&#x27;foo&#x27;</span>,</span><br><span class="line">    strict: <span class="literal">false</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+<p>接下来进行判断：</p>
+<blockquote>
+<p>2.1 如果 ref 是 Reference，并且 IsPropertyReference(ref) 是 true, 那么 this 的值为 GetBase(ref)</p>
+</blockquote>
+<p>因为 base value 是 EnvironmentRecord，并不是一个 Object 类型，还记得前面讲过的 base value 的取值可能吗？ 只可能是 undefined, an Object, a Boolean, a String, a Number, 和 an environment record 中的一种。</p>
+<p>IsPropertyReference(ref) 的结果为 false，进入下个判断：</p>
+<blockquote>
+<p>2.2 如果 ref 是 Reference，并且 base value 值是 Environment Record, 那么 this 的值为 ImplicitThisValue(ref)</p>
+</blockquote>
+<p>base value 正是 Environment Record，所以会调用 ImplicitThisValue(ref)</p>
+<p>查看规范 10.2.1.1.6，ImplicitThisValue 方法的介绍：该函数始终返回 undefined。</p>
+<p>所以最后 this 的值就是 undefined。</p>
+<h2 id="多说一句"><a href="#多说一句" class="headerlink" title="多说一句"></a>多说一句</h2><p>尽管我们可以简单的理解 this 为调用函数的对象，如果是这样的话，如何解释下面这个例子呢？</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> value = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> foo = &#123;</span><br><span class="line">  value: <span class="number">2</span>,</span><br><span class="line">  bar: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">this</span>.value;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">console</span>.log((<span class="literal">false</span> || foo.bar)()); <span class="comment">// 1</span></span><br></pre></td></tr></table></figure>
+
+
+<p>此外，又如何确定调用函数的对象是谁呢？在写文章之初，我就面临着这些问题，最后还是放弃从多个情形下给大家讲解 this 指向的思路，而是追根溯源的从 ECMASciript 规范讲解 this 的指向，尽管从这个角度写起来和读起来都比较吃力，但是一旦多读几遍，明白原理，绝对会给你一个全新的视角看待 this 。而你也就能明白，尽管 foo() 和 (foo.bar = foo.bar)() 最后结果都指向了 undefined，但是两者从规范的角度上却有着本质的区别。</p>
+<p>此篇讲解执行上下文的 this，即便不是很理解此篇的内容，依然不影响大家了解执行上下文这个主题下其他的内容。所以，依然可以安心的看下一篇文章。</p>
+</div><div class="article-licensing box"><div class="licensing-title"><p><a href="http://example.com/2021/04/02/JS/深入系列/JavaScript深入之从ECMAScript规范解读this/">http://example.com/2021/04/02/JS/深入系列/JavaScript深入之从ECMAScript规范解读this/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>yenkos</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2021-04-02</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2021-04-02</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icon" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a><a class="icon" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a><a class="icon" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><!--!--></article></div><!--!--><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/2021/04/02/JS/ES2020(ES11)%E6%96%B0%E7%89%B9%E6%80%A7/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">ES2020(ES11)新特性</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%E6%B7%B1%E5%85%A5%E4%B9%8B%E4%BB%8E%E5%8E%9F%E5%9E%8B%E5%88%B0%E5%8E%9F%E5%9E%8B%E9%93%BE/"><span class="level-item"> </span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">评论</h3><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/disqusjs@1.2.5/dist/disqusjs.css"><div id="disqus_thread"><noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div><script src="https://cdn.jsdelivr.net/npm/disqusjs@1.2.5/dist/disqus.js"></script><script>new DisqusJS({
+            shortname: 'my-blog',
+            apikey: "FHN404hDCq4UjybTvgSB9BvK8YtZOMlL7ngYZD4WUHD3N4DwKKouLCjZ3nJyHLgB",
+            siteName: "Hexo",
+            identifier: "2021/04/02/JS/深入系列/JavaScript深入之从ECMAScript规范解读this/",
+            url: "http://example.com/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%E6%B7%B1%E5%85%A5%E4%B9%8B%E4%BB%8EECMAScript%E8%A7%84%E8%8C%83%E8%A7%A3%E8%AF%BBthis/",
+            
+            
+            
+            
+            
+        });</script></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-4-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar" src="https://avatars1.githubusercontent.com/u/69024391?s=400&amp;u=5502f30feb22d546ebcc47b9ccf260348485ca17&amp;v=4" alt="Yenkos"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">Yenkos</p><p class="is-size-6 is-block">Time.</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>GUANG ZHOU</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives"><p class="title">35</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories"><p class="title">7</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags"><p class="title">13</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/yenkos" target="_blank" rel="noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Github" href="https://github.com/yenkos"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Facebook" href="https://facebook.com"><i class="fab fa-facebook"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Twitter" href="https://twitter.com"><i class="fab fa-twitter"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Dribbble" href="https://dribbble.com"><i class="fab fa-dribbble"></i></a></div></div></div><!--!--><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/Javascript/"><span class="level-start"><span class="level-item">Javascript</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/VUE/"><span class="level-start"><span class="level-item">VUE</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E4%B8%9A%E5%8A%A1/"><span class="level-start"><span class="level-item">业务</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%B7%A5%E7%A8%8B%E5%8C%96/"><span class="level-start"><span class="level-item">工程化</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="/categories/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/"><span class="level-start"><span class="level-item">性能优化</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%AE%97%E6%B3%95/"><span class="level-start"><span class="level-item">算法</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%BC%96%E7%A8%8B/"><span class="level-start"><span class="level-item">编程</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-04-02T02:17:35.427Z">2021-04-02</time></p><p class="title"><a href="/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%E6%B7%B1%E5%85%A5%E4%B9%8Bnew%E7%9A%84%E6%A8%A1%E6%8B%9F%E5%AE%9E%E7%8E%B0/"> </a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-04-02T02:17:35.427Z">2021-04-02</time></p><p class="title"><a href="/2021/04/02/CSS/CSS%20%E5%8F%98%E9%87%8F%E5%8F%8A%E5%85%B6%E5%BA%94%E7%94%A8/">CSS 变量及其应用</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-04-02T02:17:35.427Z">2021-04-02</time></p><p class="title"><a href="/2021/04/02/JS/JS%20%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF%E5%92%8C%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5/">事件循环和同步异步</a></p><p class="categories"><a href="/categories/Javascript/">Javascript</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-04-02T02:17:35.427Z">2021-04-02</time></p><p class="title"><a href="/2021/04/02/JS/JS%E5%B8%B8%E7%94%A8%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%80%EF%BC%89/">JS常用实现（一）</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-04-02T02:17:35.427Z">2021-04-02</time></p><p class="title"><a href="/2021/04/02/VUE/Vue%E6%80%A7%E8%83%BD%E6%8F%90%E5%8D%87%E4%B9%8BObject.freeze()/">Vue性能提升之Object.freeze()</a></p><p class="categories"><a href="/categories/VUE/">VUE</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2021/04/"><span class="level-start"><span class="level-item">四月 2021</span></span><span class="level-end"><span class="level-item tag">34</span></span></a></li><li><a class="level is-mobile" href="/archives/2017/11/"><span class="level-start"><span class="level-item">十一月 2017</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/Javascript/"><span class="tag">Javascript</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/VUE/"><span class="tag">VUE</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/html/"><span class="tag">html</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/nodejs/"><span class="tag">nodejs</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/npm/"><span class="tag">npm</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/rollup/"><span class="tag">rollup</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/shell/"><span class="tag">shell</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%B7%A5%E7%A8%8B%E5%8C%96/"><span class="tag">工程化</span><span class="tag">6</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/"><span class="tag">性能优化</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%99%BB%E5%BD%95/"><span class="tag">登录</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%AE%97%E6%B3%95/"><span class="tag">算法</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%BC%96%E7%A8%8B/"><span class="tag">编程</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E9%89%B4%E6%9D%83/"><span class="tag">鉴权</span><span class="tag">1</span></a></div></div></div></div></div></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="Hexo" height="28"></a><p class="is-size-7"><span>&copy; 2021 yenkos</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("zh-CN");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "此网站使用Cookie来改善您的体验。",
+          dismiss: "知道了！",
+          allow: "允许使用Cookie",
+          deny: "拒绝",
+          link: "了解更多",
+          policy: "Cookie政策",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>

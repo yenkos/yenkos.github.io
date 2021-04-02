@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>Hexo</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="Hexo"><meta name="msapplication-TileImage" content="/img/favicon.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Hexo"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="JavaScript深入之头疼的类型转换(下)前言举个例子： 在 JavaScript 中，这是完全可以运行的，不过你有没有好奇，为什么 1 和 ‘1’ 分属不同的数据类型，为什么就可以进行运算呢？ 这其实是因为 JavaScript 自动的将数据类型进行了转换，我们通常称为隐式类型转换。但是我们都知道，+运算符既可以用于数字加法，也能用于字符串拼接，那在这个例子中，是将数字 1 转成字符串 &amp;amp;#"><meta property="og:type" content="blog"><meta property="og:title" content="Hexo"><meta property="og:url" content="http://example.com/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%E6%B7%B1%E5%85%A5%E4%B9%8B%E5%A4%B4%E7%96%BC%E7%9A%84%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2(%E4%B8%8B)/"><meta property="og:site_name" content="Hexo"><meta property="og:description" content="JavaScript深入之头疼的类型转换(下)前言举个例子： 在 JavaScript 中，这是完全可以运行的，不过你有没有好奇，为什么 1 和 ‘1’ 分属不同的数据类型，为什么就可以进行运算呢？ 这其实是因为 JavaScript 自动的将数据类型进行了转换，我们通常称为隐式类型转换。但是我们都知道，+运算符既可以用于数字加法，也能用于字符串拼接，那在这个例子中，是将数字 1 转成字符串 &amp;amp;#"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://camo.githubusercontent.com/8e967a28b4ae2d67cd7bf57d86463f6c31fb39e1ec20f4e5c6c10d35da9a734c/68747470733a2f2f67772e616c6963646e2e636f6d2f7466732f5442315737704941585937674b306a535a4b7a585861696b7058612d313032322d38322e6a7067#align=left&amp;display=inline&amp;height=82&amp;margin=%5Bobject%20Object%5D&amp;originHeight=82&amp;originWidth=1022&amp;status=done&amp;style=none&amp;width=1022"><meta property="og:image" content="https://camo.githubusercontent.com/54abd5cf06039bff11cb67ff38c14ffece48f57e1bc9fb4e3067dd700e79ab5f/68747470733a2f2f67772e616c6963646e2e636f6d2f7466732f5442316a4d384b41686e31674b306a535a4b5058585876555858612d313132342d37362e6a7067#align=left&amp;display=inline&amp;height=76&amp;margin=%5Bobject%20Object%5D&amp;originHeight=76&amp;originWidth=1124&amp;status=done&amp;style=none&amp;width=1124"><meta property="article:published_time" content="2021-04-02T02:17:35.427Z"><meta property="article:modified_time" content="2021-04-02T02:17:35.427Z"><meta property="article:author" content="yenkos"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="https://camo.githubusercontent.com/8e967a28b4ae2d67cd7bf57d86463f6c31fb39e1ec20f4e5c6c10d35da9a734c/68747470733a2f2f67772e616c6963646e2e636f6d2f7466732f5442315737704941585937674b306a535a4b7a585861696b7058612d313032322d38322e6a7067#align=left&amp;display=inline&amp;height=82&amp;margin=%5Bobject%20Object%5D&amp;originHeight=82&amp;originWidth=1022&amp;status=done&amp;style=none&amp;width=1022"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://example.com/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%E6%B7%B1%E5%85%A5%E4%B9%8B%E5%A4%B4%E7%96%BC%E7%9A%84%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2(%E4%B8%8B)/"},"headline":"Hexo","image":[],"datePublished":"2021-04-02T02:17:35.427Z","dateModified":"2021-04-02T02:17:35.427Z","author":{"@type":"Person","name":"yenkos"},"description":"JavaScript深入之头疼的类型转换(下)前言举个例子： 在 JavaScript 中，这是完全可以运行的，不过你有没有好奇，为什么 1 和 ‘1’ 分属不同的数据类型，为什么就可以进行运算呢？ 这其实是因为 JavaScript 自动的将数据类型进行了转换，我们通常称为隐式类型转换。但是我们都知道，+运算符既可以用于数字加法，也能用于字符串拼接，那在这个例子中，是将数字 1 转成字符串 &amp;#"}</script><link rel="canonical" href="http://example.com/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%E6%B7%B1%E5%85%A5%E4%B9%8B%E5%A4%B4%E7%96%BC%E7%9A%84%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2(%E4%B8%8B)/"><link rel="icon" href="/img/favicon.svg"><link rel="stylesheet" href="https://cdnjs.loli.net/ajax/libs/font-awesome/5.12.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css"><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script><!--!--><!--!--><meta name="generator" content="Hexo 5.4.0"></head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="Hexo" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">Home</a><a class="navbar-item" href="/archives">Archives</a><a class="navbar-item" href="/categories">Categories</a><a class="navbar-item" href="/tags">Tags</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/yenkos"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2021-04-02T02:17:35.427Z" title="4/2/2021, 2:17:35 AM">2021-04-02</time>发表</span><span class="level-item"><time dateTime="2021-04-02T02:17:35.427Z" title="4/2/2021, 2:17:35 AM">2021-04-02</time>更新</span><span class="level-item">19 分钟读完 (大约2876个字)</span></div></div><h1 class="title is-3 is-size-4-mobile"> </h1><div class="content"><h1 id="JavaScript深入之头疼的类型转换-下"><a href="#JavaScript深入之头疼的类型转换-下" class="headerlink" title="JavaScript深入之头疼的类型转换(下)"></a>JavaScript深入之头疼的类型转换(下)</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>举个例子：</p>
+<p>在 JavaScript 中，这是完全可以运行的，不过你有没有好奇，为什么 1 和 ‘1’ 分属不同的数据类型，为什么就可以进行运算呢？</p>
+<p>这其实是因为 JavaScript 自动的将数据类型进行了转换，我们通常称为隐式类型转换。但是我们都知道，<code>+</code>运算符既可以用于数字加法，也能用于字符串拼接，那在这个例子中，是将数字 <code>1</code> 转成字符串 <code>&#39;1&#39;</code>，进行拼接运算？还是将字符串 <code>&#39;1&#39;</code> 转成数字 <code>1</code>，进行加法运算呢？</p>
+<p>先卖个关子，虽然估计你也知道答案。今天，我们就常见的隐式类型转化的场景进行介绍。</p>
+<h2 id="一元操作符"><a href="#一元操作符" class="headerlink" title="一元操作符 +"></a>一元操作符 +</h2><p>当 + 运算符作为一元操作符的时候，查看 <a target="_blank" rel="noopener" href="http://es5.github.io/#x11.4.6">ES5 规范 1.4.6</a>，会调用 <code>ToNumber</code> 处理该值，相当于 <code>Number(&#39;1&#39;)</code>，最终结果返回数字 <code>1</code>。</p>
+<p>那么下面的这些结果呢？</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(+[]);</span><br><span class="line"><span class="built_in">console</span>.log(+[<span class="string">&#x27;1&#x27;</span>]);</span><br><span class="line"><span class="built_in">console</span>.log(+[<span class="string">&#x27;1&#x27;</span>, <span class="string">&#x27;2&#x27;</span>, <span class="string">&#x27;3&#x27;</span>]);</span><br><span class="line"><span class="built_in">console</span>.log(+&#123;&#125;);</span><br></pre></td></tr></table></figure>
+
+
+<p>既然是调用 <code>ToNumber</code> 方法，回想<a target="_blank" rel="noopener" href="https://github.com/mqyqingfeng/Blog/issues/159">《JavaScript 深入之头疼的类型转换 (上)》</a>中的内容，当输入的值是对象的时候，先调用 <code>ToPrimitive(input, Number)</code> 方法，执行的步骤是：</p>
+<ol>
+<li>如果 <code>obj</code> 为基本类型，直接返回</li>
+<li>否则，调用 <code>valueOf</code> 方法，如果返回一个原始值，则 <code>JavaScript</code> 将其返回。</li>
+<li>否则，调用 <code>toString</code> 方法，如果返回一个原始值，则<code>JavaScript</code> 将其返回。</li>
+<li>否则，<code>JavaScript</code> 抛出一个类型错误异常。</li>
+</ol>
+<p>以 <code>+[]</code> 为例，<code>[]</code> 调用 <code>valueOf</code> 方法，返回一个空数组，因为不是原始值，调用 <code>toString</code> 方法，返回 <code>&quot;&quot;</code>。</p>
+<p>得到返回值后，然后再调用 <code>ToNumber</code> 方法，<code>&quot;&quot;</code> 对应的返回值是 <code>0</code>，所以最终返回 <code>0</code>。</p>
+<p>剩下的例子以此类推。结果是：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(+[<span class="string">&#x27;1&#x27;</span>]); <span class="comment">// 1</span></span><br><span class="line"><span class="built_in">console</span>.log(+[<span class="string">&#x27;1&#x27;</span>, <span class="string">&#x27;2&#x27;</span>, <span class="string">&#x27;3&#x27;</span>]); <span class="comment">// NaN</span></span><br><span class="line"><span class="built_in">console</span>.log(+&#123;&#125;); <span class="comment">// NaN</span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="二元操作符"><a href="#二元操作符" class="headerlink" title="二元操作符 +"></a>二元操作符 +</h2><h3 id="规范"><a href="#规范" class="headerlink" title="规范"></a>规范</h3><p>现在 <code>+</code> 运算符又变成了二元操作符，毕竟它也是加减乘除中的加号</p>
+<p><code>1 + &#39;1&#39;</code> 我们知道答案是 ‘11’，那 <code>null + 1</code>、<code>[] + []</code>、<code>[] + &#123;&#125;</code>、<code>&#123;&#125; + &#123;&#125;</code> 呢？</p>
+<p>如果要了解这些运算的结果，不可避免的我们要从规范下手。</p>
+<p>规范地址：<a target="_blank" rel="noopener" href="http://es5.github.io/#x11.6.1">http://es5.github.io/#x11.6.1</a></p>
+<p>不过这次就不直接大段大段的引用规范了，直接给大家讲简化后的内容。</p>
+<p>到底当执行 <code>+</code> 运算的时候，会执行怎样的步骤呢？让我们根据规范<code>11.6.1</code> 来捋一捋：</p>
+<p>当计算 value1 + value2 时：</p>
+<ol>
+<li>lprim = ToPrimitive(value1)</li>
+<li>rprim = ToPrimitive(value2)</li>
+<li>如果 lprim 是字符串或者 rprim 是字符串，那么返回 ToString(lprim) 和 ToString(rprim) 的拼接结果</li>
+<li>返回 ToNumber(lprim) 和 ToNumber(rprim) 的运算结果</li>
+</ol>
+<p>规范的内容就这样结束了。没有什么新的内容，<code>ToString</code>、<code>ToNumber</code>、<code>ToPrimitive</code>都是在<a target="_blank" rel="noopener" href="https://github.com/mqyqingfeng/Blog/issues/159">《JavaScript 深入之头疼的类型转换 (上)》</a>中讲到过的内容，所以我们直接进分析阶段：</p>
+<p>让我们来举几个例子：</p>
+<h3 id="1-Null-与数字"><a href="#1-Null-与数字" class="headerlink" title="1.Null 与数字"></a>1.Null 与数字</h3><p>按照规范的步骤进行分析：</p>
+<ol>
+<li>lprim = ToPrimitive(null) 因为 null 是基本类型，直接返回，所以 lprim = null</li>
+<li>rprim = ToPrimitive(1) 因为 1 是基本类型，直接返回，所以 rprim = null</li>
+<li>lprim 和 rprim 都不是字符串</li>
+<li>返回 ToNumber(null) 和 ToNumber(1) 的运算结果</li>
+</ol>
+<p>接下来：</p>
+<p><code>ToNumber(null)</code> 的结果为 0，(回想上篇 Number(null))，<code>ToNumber(1)</code> 的结果为 1</p>
+<p>所以，<code>null + 1</code> 相当于 <code>0 + 1</code>，最终的结果为数字 <code>1</code>。</p>
+<p>这个还算简单，看些稍微复杂的：</p>
+<h3 id="2-数组与数组"><a href="#2-数组与数组" class="headerlink" title="2. 数组与数组"></a>2. 数组与数组</h3><p>依然按照规范：</p>
+<ol>
+<li>lprim = ToPrimitive([])，[]是数组，相当于 ToPrimitive([], Number)，先调用 valueOf 方法，返回对象本身，因为不是原始值，调用 toString 方法，返回空字符串 “”</li>
+<li>rprim 类似。</li>
+<li>lprim 和 rprim 都是字符串，执行拼接操作</li>
+</ol>
+<p>所以，<code>[] + []</code>相当于 <code>&quot;&quot;+&quot;&quot;</code>，最终的结果是空字符串<code>&quot;&quot;</code>。</p>
+<p>看个更复杂的：</p>
+<h3 id="3-数组与对象"><a href="#3-数组与对象" class="headerlink" title="3. 数组与对象"></a>3. 数组与对象</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 两者结果一致</span></span><br><span class="line"><span class="built_in">console</span>.log([] + &#123;&#125;);</span><br><span class="line"><span class="built_in">console</span>.log(&#123;&#125; + []);</span><br></pre></td></tr></table></figure>
+
+
+<p>按照规范：</p>
+<ol>
+<li>lprim = ToPrimitive([])，lprim = “”</li>
+<li>rprim = ToPrimitive({})，相当于调用 ToPrimitive({}, Number)，先调用 valueOf 方法，返回对象本身，因为不是原始值，调用 toString 方法，返回 “[object Object]”</li>
+<li>lprim 和 rprim 都是字符串，执行拼接操作</li>
+</ol>
+<p>所以，<code>[] + &#123;&#125;</code> 相当于 <code>&quot;&quot;+&quot;[object Object]&quot;</code>，最终的结果是 “[object Object]”。</p>
+<p>下面的例子，可以按照示例类推出结果：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="number">1</span> + <span class="literal">true</span>);</span><br><span class="line"><span class="built_in">console</span>.log(&#123;&#125; + &#123;&#125;);</span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2017</span>, <span class="number">04</span>, <span class="number">21</span>) + <span class="number">1</span>) <span class="comment">// 这个知道是数字还是字符串类型就行</span></span><br></pre></td></tr></table></figure>
+
+
+<p>结果是：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="number">1</span> + <span class="literal">true</span>); <span class="comment">// 2</span></span><br><span class="line"><span class="built_in">console</span>.log(&#123;&#125; + &#123;&#125;); <span class="comment">// &quot;[object Object][object Object]&quot;</span></span><br><span class="line"><span class="built_in">console</span>.log(<span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2017</span>, <span class="number">04</span>, <span class="number">21</span>) + <span class="number">1</span>) <span class="comment">// &quot;Sun May 21 2017 00:00:00 GMT+0800 (CST)1&quot;</span></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>以上的运算都是在 <code>console.log</code> 中进行，如果你直接在 <code>Chrome</code> 或者 <code>Firebug</code> 开发工具中的命令行直接输入，你也许会惊讶的看到一些结果的不同，比如：</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/8e967a28b4ae2d67cd7bf57d86463f6c31fb39e1ec20f4e5c6c10d35da9a734c/68747470733a2f2f67772e616c6963646e2e636f6d2f7466732f5442315737704941585937674b306a535a4b7a585861696b7058612d313032322d38322e6a7067"><img src="https://camo.githubusercontent.com/8e967a28b4ae2d67cd7bf57d86463f6c31fb39e1ec20f4e5c6c10d35da9a734c/68747470733a2f2f67772e616c6963646e2e636f6d2f7466732f5442315737704941585937674b306a535a4b7a585861696b7058612d313032322d38322e6a7067#align=left&display=inline&height=82&margin=%5Bobject%20Object%5D&originHeight=82&originWidth=1022&status=done&style=none&width=1022">
+</a></p>
+<p>我们刚才才说过 <code>&#123;&#125; + []</code> 的结果是 <code>&quot;[object Object]&quot;</code> 呐，这怎么变成了 <code>0</code> 了？</p>
+<p>不急，我们尝试着加一个括号：</p>
+<p><a target="_blank" rel="noopener" href="https://camo.githubusercontent.com/54abd5cf06039bff11cb67ff38c14ffece48f57e1bc9fb4e3067dd700e79ab5f/68747470733a2f2f67772e616c6963646e2e636f6d2f7466732f5442316a4d384b41686e31674b306a535a4b5058585876555858612d313132342d37362e6a7067"><img src="https://camo.githubusercontent.com/54abd5cf06039bff11cb67ff38c14ffece48f57e1bc9fb4e3067dd700e79ab5f/68747470733a2f2f67772e616c6963646e2e636f6d2f7466732f5442316a4d384b41686e31674b306a535a4b5058585876555858612d313132342d37362e6a7067#align=left&display=inline&height=76&margin=%5Bobject%20Object%5D&originHeight=76&originWidth=1124&status=done&style=none&width=1124">
+</a></p>
+<p>结果又变成了正确的值，这是为什么呢？</p>
+<p>其实，在不加括号的时候，<code>&#123;&#125;</code> 被当成了一个独立的空代码块，所以 <code>&#123;&#125; + []</code> 变成了 <code>+[]</code>，结果就变成了 0</p>
+<p>同样的问题还出现在 <code>&#123;&#125; + &#123;&#125;</code> 上，而且火狐和谷歌的结果还不一样：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; &#123;&#125; + &#123;&#125;</span><br><span class="line"><span class="comment">// 火狐： NaN</span></span><br><span class="line"><span class="comment">// 谷歌： &quot;[object Object][object Object]&quot;</span></span><br></pre></td></tr></table></figure>
+
+
+<p>如果 <code>&#123;&#125;</code> 被当成一个独立的代码块，那么这句话相当于 <code>+&#123;&#125;</code>，相当于 <code>Number(&#123;&#125;)</code>，结果自然是 <code>NaN</code>，可是 <code>Chrome</code> 却在这里返回了正确的值。</p>
+<p>那为什么这里就返回了正确的值呢？我也不知道，欢迎解答~</p>
+<h2 id="相等"><a href="#相等" class="headerlink" title="== 相等"></a>== 相等</h2><h3 id="规范-1"><a href="#规范-1" class="headerlink" title="规范"></a>规范</h3><p><code>&quot;==&quot;</code> 用于比较两个值是否相等，当要比较的两个值类型不一样的时候，就会发生类型的转换。</p>
+<p>关于使用 “==” 进行比较的时候，具体步骤可以查看<a target="_blank" rel="noopener" href="http://es5.github.io/#x11.9.3">规范 11.9.5</a>：</p>
+<p>当执行 x == y 时：</p>
+<ol>
+<li>如果 x 与 y 是同一类型：<ol>
+<li>x 是 Undefined，返回 true</li>
+<li>x 是 Null，返回 true</li>
+<li>x 是数字：<ol>
+<li>x 是 NaN，返回 false</li>
+<li>y 是 NaN，返回 false</li>
+<li>x 与 y 相等，返回 true</li>
+<li>x 是 + 0，y 是 - 0，返回 true</li>
+<li>x 是 - 0，y 是 + 0，返回 true</li>
+<li>返回 false</li>
+</ol>
+</li>
+<li>x 是字符串，完全相等返回 true, 否则返回 false</li>
+<li>x 是布尔值，x 和 y 都是 true 或者 false，返回 true，否则返回 false</li>
+<li>x 和 y 指向同一个对象，返回 true，否则返回 false</li>
+</ol>
+</li>
+<li>x 是 null 并且 y 是 undefined，返回 true</li>
+<li>x 是 undefined 并且 y 是 null，返回 true</li>
+<li>x 是数字，y 是字符串，判断 x == ToNumber(y)</li>
+<li>x 是字符串，y 是数字，判断 ToNumber(x) == y</li>
+<li>x 是布尔值，判断 ToNumber(x) == y</li>
+<li>y 是布尔值，判断 x ==ToNumber(y)</li>
+<li>x 不是字符串或者数字，y 是对象，判断 x == ToPrimitive(y)</li>
+<li>x 是对象，y 不是字符串或者数字，判断 ToPrimitive(x) == y</li>
+<li>返回 false</li>
+</ol>
+<p>觉得看规范判断太复杂？我们来分几种情况来看：</p>
+<h3 id="1-null-和-undefined"><a href="#1-null-和-undefined" class="headerlink" title="1. null 和 undefined"></a>1. null 和 undefined</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="literal">null</span> == <span class="literal">undefined</span>);</span><br></pre></td></tr></table></figure>
+
+
+<p>看规范第 2、3 步：</p>
+<blockquote>
+<ol start="2">
+<li>x 是 null 并且 y 是 undefined，返回 true</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="3">
+<li>x 是 undefined 并且 y 是 null，返回 true</li>
+</ol>
+</blockquote>
+<p>所以例子的结果自然为 <code>true</code>。</p>
+<p>这时候，我们可以回想在<a target="_blank" rel="noopener" href="https://github.com/mqyqingfeng/Blog/issues/28">《JavaScript 专题之类型判断 (上)》</a>中见过的一段 <code>demo</code>，就是编写判断对象的类型 <code>type</code> 函数时，如果输入值是 <code>undefined</code>，就返回字符串 <code>undefined</code>，如果是 <code>null</code>，就返回字符串 <code>null</code>。</p>
+<p>如果是你，你会怎么写呢？</p>
+<p>下面是 jQuery 的写法：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">type</span>(<span class="params">obj</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (obj == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> obj + <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="2-字符串与数字"><a href="#2-字符串与数字" class="headerlink" title="2. 字符串与数字"></a>2. 字符串与数字</h3><p>结果肯定是 true，问题在于是字符串转化成了数字和数字比较还是数字转换成了字符串和字符串比较呢？</p>
+<p>看规范第 4、5 步：</p>
+<blockquote>
+<p>4.x 是数字，y 是字符串，判断 x == ToNumber(y)</p>
+</blockquote>
+<blockquote>
+<p>5.x 是字符串，y 是数字，判断 ToNumber(x) == y</p>
+</blockquote>
+<p>结果很明显，都是转换成数字后再进行比较</p>
+<h3 id="3-布尔值和其他类型"><a href="#3-布尔值和其他类型" class="headerlink" title="3. 布尔值和其他类型"></a>3. 布尔值和其他类型</h3><p>当要判断的一方出现 <code>false</code> 的时候，往往最容易出错，比如上面这个例子，凭直觉应该是 <code>true</code>，毕竟 <code>Boolean(&#39;2&#39;)</code> 的结果可是 true，但这道题的结果却是 false。</p>
+<p>归根到底，还是要看规范，规范第 6、7 步：</p>
+<blockquote>
+<p>6.x 是布尔值，判断 ToNumber(x) == y</p>
+</blockquote>
+<blockquote>
+<p>7.y 是布尔值，判断 x ==ToNumber(y)</p>
+</blockquote>
+<p>当一方出现布尔值的时候，就会对这一方的值进行 ToNumber 处理，也就是说 true 会被转化成 1，</p>
+<p><code>true == &#39;2&#39;</code> 就相当于 <code>1 == &#39;2&#39;</code> 就相当于 <code>1 == 2</code>，结果自然是 <code>false</code>。</p>
+<p>所以当一方是布尔值的时候，会对布尔值进行转换，因为这种特性，所以尽量少使用 <code>xx == true</code> 和 <code>xx == false</code> 的写法。</p>
+<p>比如:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 不建议</span></span><br><span class="line"><span class="keyword">if</span> (a == <span class="literal">true</span>) &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 建议</span></span><br><span class="line"><span class="keyword">if</span> (a) &#123;&#125;</span><br><span class="line"><span class="comment">// 更好</span></span><br><span class="line"><span class="keyword">if</span> (!!a) &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="4-对象与非对象"><a href="#4-对象与非对象" class="headerlink" title="4. 对象与非对象"></a>4. 对象与非对象</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log( <span class="number">42</span> == [<span class="string">&#x27;42&#x27;</span>])</span><br></pre></td></tr></table></figure>
+
+
+<p>看规范第 8、9 步：</p>
+<blockquote>
+<ol start="8">
+<li>x 不是字符串或者数字，y 是对象，判断 x == ToPrimitive(y)</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="9">
+<li>x 是对象，y 不是字符串或者数字，判断 ToPrimitive(x) == y</li>
+</ol>
+</blockquote>
+<p>以这个例子为例，会使用 <code>ToPrimitive</code> 处理 <code>[&#39;42&#39;]</code>，调用<code>valueOf</code>，返回对象本身，再调用 <code>toString</code>，返回 <code>&#39;42&#39;</code>，所以</p>
+<p><code>42 == [&#39;42&#39;]</code> 相当于 <code>42 == &#39;42&#39;</code> 相当于<code>42 == 42</code>，结果为 <code>true</code>。</p>
+<p>到此为止，我们已经看完了第 2、3、4、5、6、7、8、9 步，其他的一概返回 false。</p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>再多举几个例子进行分析：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="literal">false</span> == <span class="literal">undefined</span>)</span><br></pre></td></tr></table></figure>
+
+
+<p><code>false == undefined</code> 相当于 <code>0 == undefined</code> 不符合上面的情形，执行最后一步 返回 <code>false</code></p>
+<p><code>false == []</code> 相当于 <code>0 == []</code> 相当于 <code>0 == &#39;&#39;</code> 相当于 <code>0 == 0</code>，结果返回 <code>true</code></p>
+<p>首先会执行 <code>![]</code> 操作，转换成 false，相当于 <code>[] == false</code> 相当于 <code>[] == 0</code> 相当于 <code>&#39;&#39; == 0</code> 相当于 <code>0 == 0</code>，结果返回 <code>true</code></p>
+<p>最后再举一些会让人踩坑的例子：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="literal">false</span> == <span class="string">&quot;0&quot;</span>)</span><br><span class="line"><span class="built_in">console</span>.log(<span class="literal">false</span> == <span class="number">0</span>)</span><br><span class="line"><span class="built_in">console</span>.log(<span class="literal">false</span> == <span class="string">&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&quot;&quot;</span> == <span class="number">0</span>)</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&quot;&quot;</span> == [])</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log([] == <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">&quot;&quot;</span> == [<span class="literal">null</span>])</span><br><span class="line"><span class="built_in">console</span>.log(<span class="number">0</span> == <span class="string">&quot;\n&quot;</span>)</span><br><span class="line"><span class="built_in">console</span>.log([] == <span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+
+
+<p>以上均返回 true</p>
+<h2 id="其他-1"><a href="#其他-1" class="headerlink" title="其他"></a>其他</h2><p>除了这两种情形之外，其实还有很多情形会发生隐式类型转换，比如<code>if</code>、<code>? :</code>、<code>&amp;&amp;</code>等情况，但相对来说，比较简单，就不再讲解。</p>
+<h2 id=""><a href="#" class="headerlink" title=""></a></h2></div><div class="article-licensing box"><div class="licensing-title"><p><a href="http://example.com/2021/04/02/JS/深入系列/JavaScript深入之头疼的类型转换(下)/">http://example.com/2021/04/02/JS/深入系列/JavaScript深入之头疼的类型转换(下)/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>yenkos</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2021-04-02</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2021-04-02</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icon" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a><a class="icon" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a><a class="icon" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><!--!--></article></div><!--!--><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%E6%B7%B1%E5%85%A5%E4%B9%8B%E5%8F%98%E9%87%8F%E5%AF%B9%E8%B1%A1/"><i class="level-item fas fa-chevron-left"></i><span class="level-item"> </span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%E6%B7%B1%E5%85%A5%E4%B9%8B%E6%89%A7%E8%A1%8C%E4%B8%8A%E4%B8%8B%E6%96%87/"><span class="level-item"> </span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">评论</h3><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/disqusjs@1.2.5/dist/disqusjs.css"><div id="disqus_thread"><noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div><script src="https://cdn.jsdelivr.net/npm/disqusjs@1.2.5/dist/disqus.js"></script><script>new DisqusJS({
+            shortname: 'my-blog',
+            apikey: "FHN404hDCq4UjybTvgSB9BvK8YtZOMlL7ngYZD4WUHD3N4DwKKouLCjZ3nJyHLgB",
+            siteName: "Hexo",
+            identifier: "2021/04/02/JS/深入系列/JavaScript深入之头疼的类型转换(下)/",
+            url: "http://example.com/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%E6%B7%B1%E5%85%A5%E4%B9%8B%E5%A4%B4%E7%96%BC%E7%9A%84%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2(%E4%B8%8B)/",
+            
+            
+            
+            
+            
+        });</script></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-4-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar" src="https://avatars1.githubusercontent.com/u/69024391?s=400&amp;u=5502f30feb22d546ebcc47b9ccf260348485ca17&amp;v=4" alt="Yenkos"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">Yenkos</p><p class="is-size-6 is-block">Time.</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>GUANG ZHOU</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives"><p class="title">35</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories"><p class="title">7</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags"><p class="title">13</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/yenkos" target="_blank" rel="noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Github" href="https://github.com/yenkos"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Facebook" href="https://facebook.com"><i class="fab fa-facebook"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Twitter" href="https://twitter.com"><i class="fab fa-twitter"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Dribbble" href="https://dribbble.com"><i class="fab fa-dribbble"></i></a></div></div></div><!--!--><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/Javascript/"><span class="level-start"><span class="level-item">Javascript</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/VUE/"><span class="level-start"><span class="level-item">VUE</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E4%B8%9A%E5%8A%A1/"><span class="level-start"><span class="level-item">业务</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%B7%A5%E7%A8%8B%E5%8C%96/"><span class="level-start"><span class="level-item">工程化</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="/categories/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/"><span class="level-start"><span class="level-item">性能优化</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%AE%97%E6%B3%95/"><span class="level-start"><span class="level-item">算法</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%BC%96%E7%A8%8B/"><span class="level-start"><span class="level-item">编程</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-04-02T02:17:35.427Z">2021-04-02</time></p><p class="title"><a href="/2021/04/02/JS/%E6%B7%B1%E5%85%A5%E7%B3%BB%E5%88%97/JavaScript%E6%B7%B1%E5%85%A5%E4%B9%8Bnew%E7%9A%84%E6%A8%A1%E6%8B%9F%E5%AE%9E%E7%8E%B0/"> </a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-04-02T02:17:35.427Z">2021-04-02</time></p><p class="title"><a href="/2021/04/02/CSS/CSS%20%E5%8F%98%E9%87%8F%E5%8F%8A%E5%85%B6%E5%BA%94%E7%94%A8/">CSS 变量及其应用</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-04-02T02:17:35.427Z">2021-04-02</time></p><p class="title"><a href="/2021/04/02/JS/JS%20%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF%E5%92%8C%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5/">事件循环和同步异步</a></p><p class="categories"><a href="/categories/Javascript/">Javascript</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-04-02T02:17:35.427Z">2021-04-02</time></p><p class="title"><a href="/2021/04/02/JS/JS%E5%B8%B8%E7%94%A8%E5%AE%9E%E7%8E%B0%EF%BC%88%E4%B8%80%EF%BC%89/">JS常用实现（一）</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2021-04-02T02:17:35.427Z">2021-04-02</time></p><p class="title"><a href="/2021/04/02/VUE/Vue%E6%80%A7%E8%83%BD%E6%8F%90%E5%8D%87%E4%B9%8BObject.freeze()/">Vue性能提升之Object.freeze()</a></p><p class="categories"><a href="/categories/VUE/">VUE</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2021/04/"><span class="level-start"><span class="level-item">四月 2021</span></span><span class="level-end"><span class="level-item tag">34</span></span></a></li><li><a class="level is-mobile" href="/archives/2017/11/"><span class="level-start"><span class="level-item">十一月 2017</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/Javascript/"><span class="tag">Javascript</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/VUE/"><span class="tag">VUE</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/html/"><span class="tag">html</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/nodejs/"><span class="tag">nodejs</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/npm/"><span class="tag">npm</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/rollup/"><span class="tag">rollup</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/shell/"><span class="tag">shell</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%B7%A5%E7%A8%8B%E5%8C%96/"><span class="tag">工程化</span><span class="tag">6</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/"><span class="tag">性能优化</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%99%BB%E5%BD%95/"><span class="tag">登录</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%AE%97%E6%B3%95/"><span class="tag">算法</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%BC%96%E7%A8%8B/"><span class="tag">编程</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E9%89%B4%E6%9D%83/"><span class="tag">鉴权</span><span class="tag">1</span></a></div></div></div></div></div></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="Hexo" height="28"></a><p class="is-size-7"><span>&copy; 2021 yenkos</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("zh-CN");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "此网站使用Cookie来改善您的体验。",
+          dismiss: "知道了！",
+          allow: "允许使用Cookie",
+          deny: "拒绝",
+          link: "了解更多",
+          policy: "Cookie政策",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>
